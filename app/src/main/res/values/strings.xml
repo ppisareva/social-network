@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">SocialNetwork</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="email">enter your mail</string>
+    <string name="password">enter your password</string>
+    <string name="password_conformation">confirm your password</string>
+    <string name="reg_form">REGISTRATION FORM</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="title_activity_intro">intro</string>
+    <string name="title_activity_sign_in">Sign_in</string>
+    <string name="title_activity_sign_up">Sign_up</string>
+    <string name="registration_feild">User already exist</string>
+    <string name="password_wrong">Wrong password</string>
+    <string name="title_activity_form_activity">Form_activity</string>
+    <string name="form_name">enter your name</string>
+    <string name="form_birthday">enter your birthday</string>
+    <string name="form_sex">enter your sex</string>
+    <string name="form_text">thank you for registration, please fill the form below</string>
+    <string name="logout">Log out</string>
+</resources>
