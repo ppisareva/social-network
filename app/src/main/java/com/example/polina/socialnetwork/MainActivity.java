@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 
 public class MainActivity extends Activity {
@@ -17,14 +19,15 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
-            intent = new Intent(this, FormActivity.class);
-            startActivity(intent);
+//            intent = new Intent(this, FormActivity.class);
+//            startActivity(intent);
     }
     public void logout (View v) {
-        sPref = getSharedPreferences(SignUpActivity.TOKEN, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sPref.edit();
-        editor.remove(SignUpActivity.TOKEN);
-        editor.commit();
+        CookieSyncManager.createInstance(this);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeAllCookie();
+
+
         intent = new Intent(this, IntroActivity.class);
         startActivity(intent);
 

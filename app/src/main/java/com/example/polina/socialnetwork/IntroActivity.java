@@ -6,19 +6,20 @@ import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 
 public class IntroActivity extends Activity {
     private Intent intent;
-    private   SharedPreferences sPref;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.intro);
-        sPref = getSharedPreferences(SignUpActivity.TOKEN, MODE_PRIVATE);
-
-        if(sPref.contains(SignUpActivity.TOKEN)){
+        CookieSyncManager.createInstance(this);
+        if(CookieManager.getInstance().hasCookies()){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }

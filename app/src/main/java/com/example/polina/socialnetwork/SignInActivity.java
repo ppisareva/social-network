@@ -19,10 +19,9 @@ public class SignInActivity extends Activity {
    private TextView signInFaild;
    private String email;
    private String password;
-   private String token;
-    public static final String PATH = "/Login";
+    public static final String PATH = "/user/login";
     public static final String HOST_PATH = SignUpActivity.HOST + PATH;
-   private SharedPreferences sPref;
+
 
 
 
@@ -44,25 +43,15 @@ public class SignInActivity extends Activity {
 
             @Override
             protected JSONObject doInBackground(Void... voids) {
-                return SignUpActivity.getJsonObject(email, password, HOST_PATH);
+                return SignUpActivity.getJsonObject(email, password, HOST_PATH,SignInActivity.this);
             }
             @Override
             protected void onPostExecute(JSONObject o) {
                 if (o == null){
                    signInFaild.setText("Wrong login or password");
                 } else {
-
-                    try {
-                        token = o.getString(SignUpActivity.TOKEN);
-                        sPref = getSharedPreferences(SignUpActivity.TOKEN, MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sPref.edit();
-                        editor.putString(SignUpActivity.TOKEN, token);
-                        editor.commit();
                         Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                         startActivity(intent);
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
 
                 }
 
