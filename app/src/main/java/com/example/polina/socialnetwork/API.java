@@ -1,0 +1,17 @@
+package com.example.polina.socialnetwork;
+
+import android.content.Context;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created by polina on 04.06.15.
+ */
+public interface API {
+    public JSONObject logIn (String email, String password, Context context);
+    public JSONObject signUp (String email, String password,  Context context);
+    public JSONObject userInfo (String name, String birthday, String sex, String imageUrl, String imageMiniUrl,  Context context);
+    public  JSONObject getResponseMe ( Context context);
+
+}

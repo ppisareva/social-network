@@ -15,9 +15,12 @@
     <string name="registration_feild">User already exist</string>
     <string name="password_wrong">Wrong password</string>
     <string name="title_activity_form_activity">Form_activity</string>
-    <string name="form_name">enter your name</string>
-    <string name="form_birthday">enter your birthday</string>
-    <string name="form_sex">enter your sex</string>
-    <string name="form_text">thank you for registration, please fill the form below</string>
+    <string name="form_name">name</string>
+    <string name="form_birthday">birthday</string>
+    <string name="form_sex">sex</string>
+    <string name="form_text">FILL THE FORM BELOW</string>
     <string name="logout">Log out</string>
+    <string name="buttun_form_image">photo</string>
+    <string name="button_form_submit">submit</string>
+    <string name="ok">ok</string>
 </resources>

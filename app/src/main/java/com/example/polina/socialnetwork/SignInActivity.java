@@ -19,8 +19,7 @@ public class SignInActivity extends Activity {
    private TextView signInFaild;
    private String email;
    private String password;
-    public static final String PATH = "/user/login";
-    public static final String HOST_PATH = SignUpActivity.HOST + PATH;
+
 
 
 
@@ -43,7 +42,7 @@ public class SignInActivity extends Activity {
 
             @Override
             protected JSONObject doInBackground(Void... voids) {
-                return SignUpActivity.getJsonObject(email, password, HOST_PATH,SignInActivity.this);
+                return ((SNApp)getApplication()).api.logIn(email, password,SignInActivity.this);
             }
             @Override
             protected void onPostExecute(JSONObject o) {
