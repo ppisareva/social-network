@@ -49,6 +49,7 @@
         android:layout_height="wrap_content"
         android:text="@string/sign_up"
         android:onClick="signUp"
+        android:id="@+id/signUp"
         android:background="@drawable/button"
         android:layout_marginBottom="@dimen/mega_margin"
         android:layout_marginLeft="@dimen/mega_margin"

@@ -9,6 +9,8 @@ import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
+import org.androidannotations.annotations.EActivity;
+
 
 public class IntroActivity extends Activity {
     private Intent intent;
@@ -20,7 +22,7 @@ public class IntroActivity extends Activity {
         setContentView(R.layout.intro);
         CookieSyncManager.createInstance(this);
         if(CookieManager.getInstance().hasCookies()){
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, MainActivity_.class);
             startActivity(intent);
         }
     }
@@ -28,11 +30,11 @@ public class IntroActivity extends Activity {
     public void onClick(View v){
         switch (v.getId()){
             case R.id.sign_up:
-               intent = new Intent(this, SignUpActivity.class);
+               intent = new Intent(this, SignUpActivity_.class);
 
                 break;
             case R.id.sing_in:
-                intent = new Intent(this, SignInActivity.class);
+                intent = new Intent(this, SignInActivity_.class);
                 break;
         }
         startActivity(intent);

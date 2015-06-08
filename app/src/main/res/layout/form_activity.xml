@@ -21,35 +21,74 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/layout"
-        android:gravity="center"
+
        >
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="250dp"
+            android:id="@+id/form_image"
+            android:clickable="true"
+            android:onClick="onImageAdd"
+            android:hint="@string/buttun_form_image"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/add_user"
+            />
+
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/form_name"
             style="@style/form_button"
-
+            android:background="@android:color/transparent"
             android:hint="@string/form_name"
             />
 
-        <EditText
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/form_birthday"
             style="@style/form_button"
+            android:clickable="true"
+            android:onClick="onDateChoose"
             android:hint="@string/form_birthday"
             />
 
-        <EditText
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/form_sex"
+            android:clickable="true"
+            android:onClick="onSexChoose"
             style="@style/form_button"
             android:hint="@string/form_sex"
             />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:gravity="bottom">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onSave"
+            android:text="@string/button_form_submit"
+            android:background="@color/button1"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_horizontal"
+           />
+
     </LinearLayout>
 
 

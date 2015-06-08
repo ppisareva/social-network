@@ -4,60 +4,59 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.annotation.UiThread;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.App;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+@EActivity(R.layout.sign_in)
 public class SignInActivity extends Activity {
-   private TextView em;
-   private TextView pw;
-   private TextView signInFaild;
-   private String email;
-   private String password;
-    public static final String PATH = "/user/login";
-    public static final String HOST_PATH = SignUpActivity.HOST + PATH;
+    @ViewById(R.id.email_sign_in)
+    public TextView em;
+    @ViewById(R.id.password_sign_in)
+    public TextView pw;
+    @ViewById(R.id.sign_in_faild)
+    public TextView signInFaild;
+    private String email;
+    private String password;
 
+    @App
+    SNApp snApp;
 
-
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.sign_in);
-        em = (TextView) findViewById(R.id.email_sign_in);
-        pw = (TextView) findViewById(R.id.password_sign_in);
-        signInFaild = (TextView) findViewById(R.id.sign_in_faild);
-    }
 
     public void signIn(View v) {
         email = em.getText().toString();
         password = pw.getText().toString();
+        logIn();
+    }
 
-        new AsyncTask<Void, Void, JSONObject>() {
+    @Background
+    void logIn(){
+        JSONObject o = snApp.api.logIn(email, password, SignInActivity.this);
+        checkData(o);
+    }
 
-            @Override
-            protected JSONObject doInBackground(Void... voids) {
-                return SignUpActivity.getJsonObject(email, password, HOST_PATH,SignInActivity.this);
+    @UiThread
+    void checkData(JSONObject o){
+        Intent intent;
+        if (o == null) {
+            signInFaild.setText("Wrong login or password");
+        } else {
+            if (!o.has(FormActivity.NAME)) {
+                 intent = new Intent(SignInActivity.this, FormActivity_.class);
+            } else {
+                 intent = new Intent(SignInActivity.this, MainActivity_.class);
             }
-            @Override
-            protected void onPostExecute(JSONObject o) {
-                if (o == null){
-                   signInFaild.setText("Wrong login or password");
-                } else {
-                        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                        startActivity(intent);
-
-                }
-
-            }
-        }.execute();
-
+            startActivity(intent);
+        }
 
     }
 }
