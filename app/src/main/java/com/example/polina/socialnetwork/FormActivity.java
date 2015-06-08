@@ -11,73 +11,76 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.UiThread;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
-import org.json.JSONException;
+
+import org.androidannotations.annotations.App;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.ArrayList;;
 import java.util.List;
 
 
+@EActivity(R.layout.form_activity)
 public class FormActivity extends Activity {
     public static final String NAME = "name";
-    private TextView twname;
-    private TextView twbithday;
-    private TextView twsex;
-    private ImageView twimage;
+    @ViewById(R.id.form_name)
+    public TextView twname;
+    @ViewById(R.id.form_birthday)
+    public TextView twbithday;
+    @ViewById(R.id.form_sex)
+    public TextView twsex;
+    @ViewById(R.id.form_image)
+    public ImageView twimage;
+    @App
+    SNApp snApp;
+
     private String name;
     private String birthday;
     private String sex;
     private String image;
     private String imagemini;
-    private Uri selectedImage = null;
+    private Uri selectedImage;
     int DIALOG_DATE = 1;
     int DIALOG_SEX = 2;
+
     int RESULT_LOAD_IMAGE = 1;
-    private String female = "female";
-    private String male = "male";
-    private Intent intent;
+    private final static String FEMALE = "female";
+    private final static String MALE = "male";
+    private final static int WIDTH = 100;
+    private final static int HEIGHT = 100;
+    String data[] = {FEMALE, MALE};
 
-
-    String data[] = {female, male};
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.form_activity);
-        twname = (TextView) findViewById(R.id.form_name);
-        twbithday = (TextView) findViewById(R.id.form_birthday);
-        twsex = (TextView) findViewById(R.id.form_sex);
-        twimage = (ImageView) findViewById(R.id.form_image);
-    }
 
     protected Dialog onCreateDialog(int id) {
-        if (id == DIALOG_DATE) {
-            DatePickerDialog tpd = new DatePickerDialog(this, callBackDataDialog, 2000, 01, 01);
-            return tpd;
-        }
-        if (id == DIALOG_SEX) {
-            AlertDialog.Builder adb = new AlertDialog.Builder(this);
-            adb.setSingleChoiceItems(data, -1, sexClickListener);
-            adb.setPositiveButton(R.string.ok, sexClickListener);
-            return adb.create();
-        }
+               if (id == DIALOG_DATE) {
+                        DatePickerDialog tpd = new DatePickerDialog(this, callBackDataDialog, 2000, 01, 01);
+                        return tpd;
+                    }
+                if (id == DIALOG_SEX) {
+                       AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                       adb.setSingleChoiceItems(data, -1, sexClickListener);
+                       adb.setPositiveButton(R.string.ok, sexClickListener);
+                       return adb.create();
+                   }
         return super.onCreateDialog(id);
-    }
+           }
 
-    public void choseDate(View v) {
+    public void onDateChoose(View v) {
         showDialog(DIALOG_DATE);
     }
 
@@ -90,18 +93,19 @@ public class FormActivity extends Activity {
     };
 
 
-    public void choseSex(View v) {
-        showDialog(DIALOG_SEX);
+    public void onSexChoose(View v) {
+       showDialog(DIALOG_SEX);
     }
+
 
     DialogInterface.OnClickListener sexClickListener = new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
             ListView lv = ((AlertDialog) dialog).getListView();
             int pos = lv.getCheckedItemPosition();
             if (pos == 0) {
-                twsex.setText(female);
+                twsex.setText(FEMALE);
             } else {
-                twsex.setText(male);
+                twsex.setText(MALE);
             }
 
         }
@@ -109,8 +113,8 @@ public class FormActivity extends Activity {
     };
 
 
-    public void addImage(View v) {
-        intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+    public void onImageAdd(View v) {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, RESULT_LOAD_IMAGE);
     }
 
@@ -118,7 +122,7 @@ public class FormActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             selectedImage = data.getData();
             twimage.setImageURI(selectedImage);
         }
@@ -127,8 +131,8 @@ public class FormActivity extends Activity {
     public String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            String[] prof = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, prof, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
@@ -139,51 +143,49 @@ public class FormActivity extends Activity {
         }
     }
 
-    public void submit(View v) {
+    public void onSave(View v) {
         name = twname.getText().toString();
         birthday = twbithday.getText().toString();
         sex = twsex.getText().toString();
+        if(selectedImage!=null){
+            loadImages();
+        }
+        saveProf();
 
-        new AsyncTask<Void, Void, List<String>>() {
+    }
 
-            @Override
-            protected List<String> doInBackground(Void... voids) {
-                String path = getRealPathFromURI(FormActivity.this, selectedImage);
-                InputStream inputStream = getThumbnailImage(selectedImage);
-                String url = ConnectionTo3S.uploadImage(path);
-                String urlSmall = ConnectionTo3S.uploadImage(inputStream);
-                List<String> listOfUrls = new ArrayList<>();
-                listOfUrls.add(url);
-                listOfUrls.add(urlSmall);
-                return listOfUrls;
+    @Background
+    void saveProf() {
+        try {
+            JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
+            if (o != null) {
+                Intent intent = new Intent(FormActivity.this, MainActivity_.class);
+                startActivity(intent);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            @Override
-            protected void onPostExecute(List<String> urls) {
-                if (urls != null) {
-                    image = urls.get(0);
-                    imagemini = urls.get(1);
-                }
-            }
-        }.execute();
+    @Background
+    void loadImages() {
 
-        new AsyncTask<Void, Void, Void>() {
+        String path = getRealPathFromURI(FormActivity.this, selectedImage);
+        InputStream inputStream = getThumbnailImage(selectedImage);
+        String url = S3Helper.uploadImage(path);
+        String urlSmall = S3Helper.uploadImage(inputStream);
+        List<String> listOfUrls = new ArrayList<>();
+        listOfUrls.add(url);
+        listOfUrls.add(urlSmall);
+        saveImages(listOfUrls);
+    }
 
-            @Override
-            protected Void doInBackground(Void... voids) {
-                try {
-                    JSONObject o = ((SNApp) getApplication()).api.userInfo(name, birthday, sex, image, imagemini, FormActivity.this);
-                    if(o!= null){
-                        intent = new Intent(FormActivity.this, MainActivity.class);
-                        startActivity(intent);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-        }.execute();
+    @UiThread
+    void saveImages(List<String> urls) {
+        if (urls != null) {
+            image = urls.get(0);
+            imagemini = urls.get(1);
+        }
     }
 
 
@@ -191,7 +193,7 @@ public class FormActivity extends Activity {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
             System.out.println(bitmap.toString());
-            Bitmap resizedBitmap = getResizedBitmap(bitmap, 100, 100);
+            Bitmap resizedBitmap = getResizedBitmap(bitmap, HEIGHT, WIDTH);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, bos);
             byte[] bitmapdata = bos.toByteArray();
@@ -224,29 +226,5 @@ public class FormActivity extends Activity {
 
         return resizedBitmap;
 
-    }
-
-
-    public String getThumbnailPath(Uri uri) {
-        String[] proj = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA};
-
-        // This method was deprecated in API level 11
-        Cursor cursor = managedQuery(uri, proj, null, null, null);
-
-        System.err.println("NAMES: " + Arrays.toString(cursor.getColumnNames()));
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
-
-        cursor.moveToFirst();
-        long imageId = cursor.getLong(column_index);
-        //cursor.close();
-        String result = "";
-        cursor = MediaStore.Images.Thumbnails.queryMiniThumbnail(getContentResolver(), imageId,
-                MediaStore.Images.Thumbnails.MINI_KIND, null);
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            result = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails.DATA));
-            cursor.close();
-        }
-        return result;
     }
 }

@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public interface API {
     public JSONObject logIn (String email, String password, Context context);
     public JSONObject signUp (String email, String password,  Context context);
-    public JSONObject userInfo (String name, String birthday, String sex, String imageUrl, String imageMiniUrl,  Context context);
-    public  JSONObject getResponseMe ( Context context);
+    public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl, Context context);
+    public  JSONObject getProfile(Context context);
 
 }

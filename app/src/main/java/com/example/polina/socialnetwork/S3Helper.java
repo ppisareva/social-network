@@ -13,10 +13,11 @@ import java.io.InputStream;
 /**
  * Created by polina on 04.06.15.
  */
-public class ConnectionTo3S {
+public class S3Helper {
     private static String MY_ACCESS_KEY_ID = Key.MY_ACCESS_KEY_ID;
     private static String MY_SECRET_KEY = Key.MY_SECRET_KEY;
     private static String BUCKET_NAME = Key.BUCKET_NAME;
+    private static String PATH ="https://s3-eu-west-1.amazonaws.com/";
 
    public static String uploadImage(String path) {
         AWSCredentials credentials = new BasicAWSCredentials(MY_ACCESS_KEY_ID, MY_SECRET_KEY);
@@ -26,7 +27,7 @@ public class ConnectionTo3S {
 
         try {
             UploadResult r = upload.waitForUploadResult();
-            return "https://s3-eu-west-1.amazonaws.com/" + r.getBucketName() + "/" + r.getKey();
+            return PATH + r.getBucketName() + "/" + r.getKey();
         } catch (InterruptedException e) {
             e.printStackTrace();
             return null;
@@ -44,7 +45,7 @@ public class ConnectionTo3S {
             UploadResult r = upload.waitForUploadResult();
 
 
-            return "https://s3-eu-west-1.amazonaws.com/" + r.getBucketName() + "/" + r.getKey();
+            return PATH + r.getBucketName() + "/" + r.getKey();
 
 
         } catch (InterruptedException e) {

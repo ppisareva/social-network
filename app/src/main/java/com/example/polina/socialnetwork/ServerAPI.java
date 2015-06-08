@@ -14,9 +14,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +22,17 @@ import java.util.List;
  * Created by polina on 04.06.15.
  */
 public class ServerAPI implements API {
-    private String logInPath = "https://socialnetwork-core-rest.herokuapp.com/user/login";
-    private String sighUpPath = "https://socialnetwork-core-rest.herokuapp.com/user/register";
-    private String userInfoPath = "https://socialnetwork-core-rest.herokuapp.com/user/me";
+    private static  String HOST = "https://socialnetwork-core-rest.herokuapp.com/";
+    private String logInPath = HOST + "user/login";
+    private String sighUpPath = HOST + "user/register";
+    private String userInfoPath = HOST + "/user/me";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
     private static final String NAME = "name";
     private static final String BIRTHDAY = "birthday";
     private static final String SEX = "sex";
-    private static final String PROF_URL = "url";
-    private static final String MINI_PROF_URL = "mini url";
+    private static final String PROF_URL = "profile_url";
+    private static final String MINI_PROF_URL = "mini_profile_url";
 
 
 
@@ -50,7 +49,7 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject userInfo(String name, String birthday, String sex, String imageUrl, String imageMiniUrl,  Context context)  {
+    public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl, Context context)  {
         JSONObject o = new JSONObject();
         try {
             o.put(NAME, name);
@@ -83,7 +82,7 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getResponseMe(Context context) {
+    public JSONObject getProfile(Context context) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpGet get = new HttpGet(userInfoPath);

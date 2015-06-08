@@ -31,11 +31,12 @@
             android:layout_height="250dp"
             android:id="@+id/form_image"
             android:clickable="true"
-            android:onClick="addImage"
+            android:onClick="onImageAdd"
             android:hint="@string/buttun_form_image"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/add_user"
             />
+
 
         <EditText
             android:layout_width="match_parent"
@@ -52,7 +53,7 @@
             android:id="@+id/form_birthday"
             style="@style/form_button"
             android:clickable="true"
-            android:onClick="choseDate"
+            android:onClick="onDateChoose"
             android:hint="@string/form_birthday"
             />
 
@@ -61,7 +62,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/form_sex"
             android:clickable="true"
-            android:onClick="choseSex"
+            android:onClick="onSexChoose"
             style="@style/form_button"
             android:hint="@string/form_sex"
             />
@@ -79,7 +80,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="submit"
+            android:onClick="onSave"
             android:text="@string/button_form_submit"
             android:background="@color/button1"
             android:layout_marginBottom="5dp"
