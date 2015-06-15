@@ -147,9 +147,6 @@ public class FormActivity extends Activity {
         name = twname.getText().toString();
         birthday = twbithday.getText().toString();
         sex = twsex.getText().toString();
-        if(selectedImage!=null){
-            loadImages();
-        }
         saveProf();
 
     }
@@ -157,7 +154,13 @@ public class FormActivity extends Activity {
     @Background
     void saveProf() {
         try {
+            String path = getRealPathFromURI(FormActivity.this, selectedImage);
+            InputStream inputStream = getThumbnailImage(selectedImage);
+            image = S3Helper.uploadImage(path);
+            imagemini = S3Helper.uploadImage(inputStream);
             JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
+            System.err.println(o);
+
             if (o != null) {
                 Intent intent = new Intent(FormActivity.this, MainActivity_.class);
                 startActivity(intent);
@@ -167,26 +170,7 @@ public class FormActivity extends Activity {
         }
     }
 
-    @Background
-    void loadImages() {
 
-        String path = getRealPathFromURI(FormActivity.this, selectedImage);
-        InputStream inputStream = getThumbnailImage(selectedImage);
-        String url = S3Helper.uploadImage(path);
-        String urlSmall = S3Helper.uploadImage(inputStream);
-        List<String> listOfUrls = new ArrayList<>();
-        listOfUrls.add(url);
-        listOfUrls.add(urlSmall);
-        saveImages(listOfUrls);
-    }
-
-    @UiThread
-    void saveImages(List<String> urls) {
-        if (urls != null) {
-            image = urls.get(0);
-            imagemini = urls.get(1);
-        }
-    }
 
 
     public InputStream getThumbnailImage(Uri uri) {
@@ -205,7 +189,7 @@ public class FormActivity extends Activity {
         }
     }
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+    public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
 
         int width = bm.getWidth();
         int height = bm.getHeight();

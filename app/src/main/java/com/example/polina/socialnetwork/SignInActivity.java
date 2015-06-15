@@ -44,7 +44,7 @@ public class SignInActivity extends Activity {
         checkData(o);
     }
 
-    @UiThread
+   @ org.androidannotations.annotations.UiThread
     void checkData(JSONObject o){
         Intent intent;
         if (o == null) {

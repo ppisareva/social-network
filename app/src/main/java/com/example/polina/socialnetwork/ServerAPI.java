@@ -28,11 +28,11 @@ public class ServerAPI implements API {
     private String userInfoPath = HOST + "/user/me";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
-    private static final String NAME = "name";
-    private static final String BIRTHDAY = "birthday";
+    public static final String NAME = "name";
+    public static final String BIRTHDAY = "birthday";
     private static final String SEX = "sex";
-    private static final String PROF_URL = "profile_url";
-    private static final String MINI_PROF_URL = "mini_profile_url";
+    public static final String PROF_URL = "profile_url";
+    public static final String MINI_PROF_URL = "mini_profile_url";
 
 
 

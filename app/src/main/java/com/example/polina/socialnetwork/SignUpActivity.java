@@ -36,14 +36,14 @@ public class SignUpActivity extends Activity {
         check(o);
     }
 
-    @UiThread
+    @org.androidannotations.annotations.UiThread
     void check(JSONObject o) {
         if (o == null) {
             registrationFail.setText(R.string.registration_feild);
             registrationFail.setVisibility(View.VISIBLE);
             return;
         } else {
-            Intent intent = new Intent(SignUpActivity.this, FormActivity_.class);
+            Intent intent = new Intent(this, FormActivity_.class);
             startActivity(intent);
         }
     }
