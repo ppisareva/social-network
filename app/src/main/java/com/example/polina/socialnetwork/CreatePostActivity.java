@@ -142,6 +142,8 @@ public class CreatePostActivity extends ActionBarActivity {
         startActivityForResult(intent, RESULT_LOAD_FILE);
     }
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
