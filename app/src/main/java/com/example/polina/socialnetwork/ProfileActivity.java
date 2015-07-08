@@ -1,9 +1,11 @@
 package com.example.polina.socialnetwork;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 //import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,14 +15,17 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,26 +43,24 @@ public class ProfileActivity extends ActionBarActivity {
     public ImageView image;
     @ViewById(R.id.prof_name)
     public TextView name;
-
-    View dialogLayout;
     String profileURL;
-
-    private static final int DIALOGIMAGE = 1;
+    String connection_faild;
+    SharedPreferences sharedPreferences;
+    public static final String PROFILE_PREFERENCES = "profile info";
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        connection_faild = getResources().getString(R.string.connection_faild);
+        sharedPreferences = getSharedPreferences(PROFILE_PREFERENCES, MODE_PRIVATE);
         loadProfInfo();
-    }
-
-    public void onShowImage(View v){
-        showDialog(DIALOGIMAGE);
     }
 
     @Background
     public void loadProfInfo() {
         JSONObject o = snApp.api.getProfile(ProfileActivity.this);
-        addProfileInfo(o);
+
+            addProfileInfo(o);
     }
     @Background
     public void getBitmap(URL url){
@@ -69,23 +72,53 @@ public class ProfileActivity extends ActionBarActivity {
        e.printStackTrace();
         }
     }
-
+@UiThread
     public void saveImage(Bitmap bitmap){
         image.setImageBitmap(bitmap);
     }
 
+    private void loadProfileFromMemory(SharedPreferences sharedPreferences){
+        name.setText(sharedPreferences.getString(ServerAPI.NAME, ""));
+        int y = calculateAmountYears(sharedPreferences.getString(ServerAPI.BIRTHDAY, ""));
+        String years = getResources().getQuantityString(R.plurals.years, y, y);
+        birthday.setText(years);
+        profileURL = sharedPreferences.getString(ServerAPI.PROF_URL, "");
+        try {
+            getBitmap(new URL(profileURL));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @org.androidannotations.annotations.UiThread
     public void addProfileInfo(JSONObject o){
-        System.err.println(o);
-        try{
-            name.setText(o.getString(ServerAPI.NAME));
-            int y = calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
-            String years = getResources().getQuantityString(R.plurals.years, y, y);
-            birthday.setText(years);
-            profileURL = o.getString(ServerAPI.PROF_URL);
-            getBitmap(new URL (profileURL));
-        } catch (Exception e){
-            e.printStackTrace();
+
+
+        if(o!=null) {
+            try {
+                if(sharedPreferences.contains(ServerAPI.NAME)){
+                    loadProfileFromMemory(sharedPreferences);
+                } else {
+                    name.setText(o.getString(ServerAPI.NAME));
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(ServerAPI.NAME, o.getString(ServerAPI.NAME));
+                    int y = calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
+                    String years = getResources().getQuantityString(R.plurals.years, y, y);
+                    birthday.setText(years);
+                    editor.putString(ServerAPI.BIRTHDAY, o.getString(ServerAPI.BIRTHDAY));
+                    profileURL = o.getString(ServerAPI.PROF_URL);
+                    getBitmap(new URL(profileURL));
+                    editor.putString(ServerAPI.PROF_URL,o.getString(ServerAPI.PROF_URL));
+                    editor.commit();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            if(sharedPreferences.contains(ServerAPI.NAME)){
+                loadProfileFromMemory(sharedPreferences);
+            }
+            Toast.makeText(ProfileActivity.this, connection_faild, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -114,6 +147,7 @@ public class ProfileActivity extends ActionBarActivity {
                 startActivity(intent);
                 break;
             case R.id.edit_profile:
+                sharedPreferences.edit().clear().commit();
                 intent = new Intent(this, FormActivity_.class);
                 startActivity(intent);
                 break;

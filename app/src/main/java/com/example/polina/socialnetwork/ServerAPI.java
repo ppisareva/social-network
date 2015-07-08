@@ -154,7 +154,7 @@ public class ServerAPI implements API {
         }
     }
 
-    public JSONObject newPost(Context context, String massage, String location, String attachment, String image, String account) {
+    public JSONObject newPost(Context context, String massage, JSONObject location, String attachment, String image, String account) {
         JSONObject o = new JSONObject();
 
         try {

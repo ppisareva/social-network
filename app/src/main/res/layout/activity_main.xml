@@ -18,9 +18,6 @@
             android:id="@+id/prof_image"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:clickable="true"
-            android:onClick="onShowImage"
-
             android:scaleType="centerCrop"
             android:focusableInTouchMode="false" />
 

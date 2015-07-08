@@ -13,6 +13,6 @@ public interface API {
     public JSONObject signUp (String email, String password,  Context context);
     public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl, Context context);
     public  JSONObject getProfile(Context context);
-    public JSONObject newPost (Context context, String massage, String location, String attachment, String image, String account);
+    public JSONObject newPost (Context context, String massage, JSONObject location, String attachment, String image, String account);
 
 }
