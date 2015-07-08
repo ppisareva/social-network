@@ -200,7 +200,7 @@ public class CreatePostActivity extends ActionBarActivity {
 
 
     @Background
-    public void sandPost() {
+    public void sendPost() {
         sendingPost();
         JSONObject o = snApp.api.newPost(this, massage, jsonLocation, attachment, image, account);
         System.err.println("Image not choose" + image);
@@ -233,7 +233,7 @@ public class CreatePostActivity extends ActionBarActivity {
                 break;
             case R.id.action_send:
                 if (isNetworkAvailable()) {
-                    sandPost();
+                    sendPost();
                 } else {
                     Toast.makeText(CreatePostActivity.this, connection_faild, Toast.LENGTH_LONG).show();
                 }
