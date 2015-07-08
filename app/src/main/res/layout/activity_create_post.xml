@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/back6"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/post_text"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:id="@+id/post_image"
+            style="@style/image_view_post" />
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:id="@+id/post_location"
+            android:src="@drawable/location"
+            style="@style/image_view_post" />
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:id="@+id/post_file"
+            android:src="@drawable/attachment"
+            style="@style/image_view_post" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_attach_file_white_48dp"
+            android:id="@+id/attach_button"
+            style="@style/buttom_action_bar"
+            android:scaleType="center"
+            android:onClick="onAttach"/>
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            style="@style/buttom_action_bar"
+            android:background="@drawable/ic_location_on_white_48dp"
+            android:id="@+id/location_button"
+            android:onClick="onLocationAttach"/>
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            style="@style/buttom_action_bar"
+            android:id="@+id/image_button"
+            android:onClick="onImageAttach"
+            android:background="@drawable/ic_photo_camera_white_48dp" />
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            style="@style/buttom_action_bar"
+            android:background="@drawable/ic_supervisor_account_white_48dp"
+            android:id="@+id/account_attach_button"
+            android:onClick="onAccountAttach"
+            android:scaleType="fitEnd" />
+    </LinearLayout>
+</LinearLayout>

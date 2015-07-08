@@ -12,13 +12,10 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.UiThread;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.androidannotations.annotations.App;
@@ -31,8 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;;
-import java.util.List;
+;
 
 
 @EActivity(R.layout.form_activity)
@@ -128,7 +124,7 @@ public class FormActivity extends Activity {
         }
     }
 
-    public String getRealPathFromURI(Context context, Uri contentUri) {
+    public static String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
             String[] prof = {MediaStore.Images.Media.DATA};
@@ -162,7 +158,7 @@ public class FormActivity extends Activity {
             System.err.println(o);
 
             if (o != null) {
-                Intent intent = new Intent(FormActivity.this, MainActivity_.class);
+                Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
                 startActivity(intent);
             }
         } catch (Exception e) {

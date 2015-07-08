@@ -2,11 +2,6 @@ package com.example.polina.socialnetwork;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.support.annotation.UiThread;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,7 +9,6 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 @EActivity(R.layout.sign_in)
@@ -53,7 +47,7 @@ public class SignInActivity extends Activity {
             if (!o.has(FormActivity.NAME)) {
                  intent = new Intent(SignInActivity.this, FormActivity_.class);
             } else {
-                 intent = new Intent(SignInActivity.this, MainActivity_.class);
+                 intent = new Intent(SignInActivity.this, ProfileActivity_.class);
             }
             startActivity(intent);
         }

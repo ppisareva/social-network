@@ -18,9 +18,6 @@
             android:id="@+id/prof_image"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:clickable="true"
-            android:onClick="onShowImage"
-
             android:scaleType="centerCrop"
             android:focusableInTouchMode="false" />
 
@@ -48,7 +45,9 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/button2"
+                android:text="@string/button_post"
+                android:onClick="onPost"
+                android:id="@+id/button_post_activity"
                 android:layout_weight="0" />
 
         </LinearLayout>

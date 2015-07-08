@@ -2,14 +2,10 @@ package com.example.polina.socialnetwork;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-
-import org.androidannotations.annotations.EActivity;
 
 
 public class IntroActivity extends Activity {
@@ -22,7 +18,7 @@ public class IntroActivity extends Activity {
         setContentView(R.layout.intro);
         CookieSyncManager.createInstance(this);
         if(CookieManager.getInstance().hasCookies()){
-            Intent intent = new Intent(this, MainActivity_.class);
+            Intent intent = new Intent(this, ProfileActivity_.class);
             startActivity(intent);
         }
     }
