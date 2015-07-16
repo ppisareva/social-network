@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.UiThread;
@@ -12,6 +13,7 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 @EActivity(R.layout.registration)
@@ -30,6 +32,8 @@ public class SignUpActivity extends Activity {
     @App
     SNApp snApp;
 
+    SharedPreferences sharedPreferencesUserId;
+
     @Background
     void signUpData() {
         JSONObject o = snApp.api.signUp(email, password, SignUpActivity.this);
@@ -38,6 +42,15 @@ public class SignUpActivity extends Activity {
 
     @org.androidannotations.annotations.UiThread
     void check(JSONObject o) {
+        sharedPreferencesUserId =  getSharedPreferences(ProfileActivity.USER_ID_PREFERENCES, MODE_PRIVATE);
+
+            try {
+                SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
+                ed.putString(ProfileActivity.USER_ID, o.getString(ProfileActivity.USER_ID) );
+                ed.commit();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         if (o == null) {
             registrationFail.setText(R.string.registration_feild);
             registrationFail.setVisibility(View.VISIBLE);

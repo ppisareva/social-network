@@ -56,19 +56,17 @@ public class CreatePostActivity extends ActionBarActivity {
     EditText text;
     @ViewById(R.id.post_image)
     ImageView postImage;
-    @ViewById(R.id.post_file)
-    ImageView post_file;
-    @ViewById(R.id.post_location)
+    @ViewById(R.id.location_button)
     ImageView post_location;
+    @ViewById(R.id.account_attach_button)
+    ImageView account_attached;
     Uri attachedImage;
 
     private static int RESULT_LOAD_IMAGE = 2;
-    private static int RESULT_LOAD_FILE = 3;
     private static int TAKE_PICTURE = 1;
     private static int DIALOG_IMAGE = 1;
 
     String massage;
-    String attachment;
     String account;
     String image;
     Location location;
@@ -95,7 +93,6 @@ public class CreatePostActivity extends ActionBarActivity {
     DialogInterface.OnClickListener imageClickListener = new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
             Intent intent;
-            ListView lv = ((AlertDialog) dialog).getListView();
             if (which == 0) {
                 intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, RESULT_LOAD_IMAGE);
@@ -106,7 +103,6 @@ public class CreatePostActivity extends ActionBarActivity {
                 attachedImage = Uri.fromFile(photo);
                 startActivityForResult(intent, TAKE_PICTURE);
             }
-
         }
 
     };
@@ -118,7 +114,6 @@ public class CreatePostActivity extends ActionBarActivity {
 
     public void onLocationAttach(View v) throws JSONException {
         LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
         LocationListener mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(final Location loc) {
@@ -145,17 +140,12 @@ public class CreatePostActivity extends ActionBarActivity {
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
         Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        JSONObject jsonLocation = new JSONObject();
+        jsonLocation = new JSONObject();
         jsonLocation.put("longitude", location.getLongitude());
         jsonLocation.put("latitude", location.getLatitude());
         Log.d("Location", location.toString());
-        post_location.setVisibility(View.VISIBLE);
-    }
-
-    public void onAttach(View v) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        startActivityForResult(intent, RESULT_LOAD_FILE);
+        post_location.setImageResource(R.drawable.ic_room_black_48dp);
+        System.err.println("location" + jsonLocation.toString());
     }
 
     @Override
@@ -171,10 +161,7 @@ public class CreatePostActivity extends ActionBarActivity {
 
             postImage.setImageURI(attachedImage);
         }
-        if (requestCode == RESULT_LOAD_FILE && data != null) {
-            attachment = FormActivity.getRealPathFromURI(CreatePostActivity.this, data.getData());
-            post_file.setVisibility(View.VISIBLE);
-        }
+
     }
 
     @Background
@@ -187,6 +174,7 @@ public class CreatePostActivity extends ActionBarActivity {
     @UiThread
     public void loadImageInBackground(String path) {
         image = S3Helper.uploadImage(path);
+        System.err.println("image " + image);
         postImage.setVisibility(View.VISIBLE);
         postImage.setImageURI(attachedImage);
 
@@ -202,7 +190,8 @@ public class CreatePostActivity extends ActionBarActivity {
     @Background
     public void sendPost() {
         sendingPost();
-        JSONObject o = snApp.api.newPost(this, massage, jsonLocation, attachment, image, account);
+        massage = text.getText().toString();
+        JSONObject o = snApp.api.newPost(this, massage, jsonLocation, image, account);
         System.err.println("Image not choose" + image);
         if (o != null) {
             Intent intent = new Intent(this, ProfileActivity_.class);
@@ -211,7 +200,7 @@ public class CreatePostActivity extends ActionBarActivity {
     }
 
     @UiThread
-    public void sendingPost(){
+    public void sendingPost() {
         ProgressDialog progressDialog = new ProgressDialog(CreatePostActivity.this);
         progressDialog.setMessage(getResources().getString(R.string.wait));
         progressDialog.show();
@@ -243,6 +232,7 @@ public class CreatePostActivity extends ActionBarActivity {
     }
 
     public void onAccountAttach(View v) {
+        account_attached.setImageResource(R.drawable.ic_supervisor_account_black_48dp);
     }
 
     private boolean isNetworkAvailable() {

@@ -7,10 +7,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.DatePicker;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
 
@@ -28,6 +32,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 ;
 
 
@@ -61,6 +70,72 @@ public class FormActivity extends Activity {
     private final static int HEIGHT = 100;
     String data[] = {FEMALE, MALE};
 
+    SharedPreferences sharedPreferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedPreferences = getSharedPreferences(ProfileActivity.PROFILE_PREFERENCES, MODE_PRIVATE);
+        loadProfInfo();
+
+    }
+
+    @Background
+    public void loadProfInfo() {
+
+        JSONObject o = snApp.api.getProfile(FormActivity.this);
+        addProfileInfo(o);
+
+    }
+
+    @org.androidannotations.annotations.UiThread
+    public void addProfileInfo(JSONObject o) {
+
+
+        if (o != null) {
+            try {
+
+                twname.setText(o.getString(ServerAPI.NAME));
+
+                int y = ProfileActivity.calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
+                String years = getResources().getQuantityString(R.plurals.years, y, y);
+                twbithday.setText(years);
+                String profileURL = o.getString(ServerAPI.PROF_URL);
+                image = o.getString(ServerAPI.PROF_URL);
+                imagemini = o.getString(ServerAPI.MINI_PROF_URL);
+                birthday = o.getString(ServerAPI.BIRTHDAY);
+                sex = o.getString(ServerAPI.SEX);
+                twsex.setText(sex);
+                System.err.println("on load " + birthday);
+                System.err.println("on load "+sex);
+                getBitmap(new URL(profileURL));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(ServerAPI.NAME, o.getString(ServerAPI.NAME));
+                editor.putString(ServerAPI.BIRTHDAY, o.getString(ServerAPI.BIRTHDAY));
+                editor.putString(ServerAPI.PROF_URL,o.getString(ServerAPI.PROF_URL));
+                editor.commit();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    @Background
+    public void getBitmap(URL url){
+        try {
+            InputStream in = url.openStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(in);
+            saveImage(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @UiThread
+    public void saveImage(Bitmap bitmap){
+        twimage.setImageBitmap(bitmap);
+    }
 
     protected Dialog onCreateDialog(int id) {
                if (id == DIALOG_DATE) {
@@ -83,8 +158,8 @@ public class FormActivity extends Activity {
     DatePickerDialog.OnDateSetListener callBackDataDialog = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
-
-            twbithday.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
+            birthday = dayOfMonth + "/" + monthOfYear + "/" + year;
+            twbithday.setText(birthday);
         }
     };
 
@@ -140,30 +215,35 @@ public class FormActivity extends Activity {
     }
 
     public void onSave(View v) {
-        name = twname.getText().toString();
-        birthday = twbithday.getText().toString();
-        sex = twsex.getText().toString();
-        saveProf();
+            name = twname.getText().toString();
+        System.err.println("on save"+ birthday);
+            sex = twsex.getText().toString();
+        System.err.println("on save"+ sex);
 
+        saveProf();
     }
 
     @Background
     void saveProf() {
-        try {
-            String path = getRealPathFromURI(FormActivity.this, selectedImage);
-            InputStream inputStream = getThumbnailImage(selectedImage);
-            image = S3Helper.uploadImage(path);
-            imagemini = S3Helper.uploadImage(inputStream);
-            JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
-            System.err.println(o);
 
-            if (o != null) {
-                Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
-                startActivity(intent);
+            try {
+                if(selectedImage!=null) {
+                    String path = getRealPathFromURI(FormActivity.this, selectedImage);
+                    InputStream inputStream = getThumbnailImage(selectedImage);
+                    image = S3Helper.uploadImage(path);
+                    imagemini = S3Helper.uploadImage(inputStream);
+                }
+                JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
+                System.err.println(o);
+
+                if (o != null) {
+                    Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
+                    startActivity(intent);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
 

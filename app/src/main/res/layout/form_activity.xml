@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/back6">
+    android:background="@drawable/material_design" >
 
 
     <TextView
@@ -45,7 +45,7 @@
             style="@style/form_button"
             android:background="@android:color/transparent"
             android:hint="@string/form_name"
-            />
+             />
 
         <TextView
             android:layout_width="match_parent"

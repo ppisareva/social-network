@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +10,7 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 @EActivity(R.layout.sign_in)
@@ -21,6 +23,7 @@ public class SignInActivity extends Activity {
     public TextView signInFaild;
     private String email;
     private String password;
+    SharedPreferences sharedPreferencesUserId;
 
     @App
     SNApp snApp;
@@ -33,21 +36,30 @@ public class SignInActivity extends Activity {
     }
 
     @Background
-    void logIn(){
+    void logIn() {
         JSONObject o = snApp.api.logIn(email, password, SignInActivity.this);
         checkData(o);
     }
 
-   @ org.androidannotations.annotations.UiThread
-    void checkData(JSONObject o){
+    @org.androidannotations.annotations.UiThread
+    void checkData(JSONObject o) {
+        sharedPreferencesUserId = getSharedPreferences(ProfileActivity.USER_ID_PREFERENCES, MODE_PRIVATE);
+        try {
+            SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
+            ed.putString(ProfileActivity.USER_ID, o.getString(ProfileActivity.USER_ID));
+            ed.commit();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Intent intent;
         if (o == null) {
             signInFaild.setText("Wrong login or password");
         } else {
             if (!o.has(FormActivity.NAME)) {
-                 intent = new Intent(SignInActivity.this, FormActivity_.class);
+                intent = new Intent(SignInActivity.this, FormActivity_.class);
             } else {
-                 intent = new Intent(SignInActivity.this, ProfileActivity_.class);
+                intent = new Intent(SignInActivity.this, ProfileActivity_.class);
             }
             startActivity(intent);
         }
