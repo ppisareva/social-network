@@ -38,4 +38,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.+'
     compile 'com.amazonaws:aws-android-sdk-core:2.1.+'
     compile 'com.amazonaws:aws-android-sdk-s3:2.1.+'
+    compile 'com.mcxiaoke.volley:library:1.0.15'
+    compile 'com.android.support:cardview-v7:+'
+    compile 'com.android.support:recyclerview-v7:+'
+
 }
