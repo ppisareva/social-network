@@ -10,33 +10,42 @@ public class Post {
 
 
     double createdAt;
-    boolean own_like;
+    boolean ownLike;
     String name;
-    String _id;
+    String _idUser;
+
+    String idPost;
+
     String message;
     String latitude;
     String longitude;
     String image;
-    String profile_image;
+    String profileImage;
 
-    public void setOwn_like(boolean own_like) {
-        this.own_like = own_like;
+    public void setOwnLike(boolean ownLike) {
+        this.ownLike = ownLike;
     }
+
+
+    public String getIdPost() {
+        return idPost;
+    }
+
 
     public double getCreatedAt() {
         return createdAt;
     }
 
-    public boolean isOwn_like() {
-        return own_like;
+    public boolean isOwnLike() {
+        return ownLike;
     }
 
     public String getName() {
         return name;
     }
 
-    public String get_id() {
-        return _id;
+    public String get_idUset() {
+        return _idUser;
     }
 
     public String getMessage() {
@@ -56,15 +65,16 @@ public class Post {
     }
 
 
-    public String getProfile_image() {
-        return profile_image;
+    public String getProfileImage() {
+        return profileImage;
     }
 
-    public static final String TIMESTAMP = "createdAt";
+    public static final String TIMESTAMP = "created_at";
     public static final String LIKE = "own_like";
     public static final String CREATED_BY = "created_by";
     public static final String NAME = "name";
-    public static final String ID = "_id";
+    public static final String IDUSER = "_id";
+    public static final String IDPOST = "_id";
     public static final String MASSAGE = "massage";
     public static final String LOCATION = "location";
     public static final String LATITUDE = "latitude";
@@ -72,24 +82,27 @@ public class Post {
     public static final String IMAGE = "image";
 
 
-    public Post(Double createdAt, boolean own_like, String name, String _id, String message, String latitude, String longitude, String image, String profile_image) {
+
+    public Post(String idPost, Double createdAt, boolean ownLike, String name, String _idUser, String message, String latitude, String longitude, String image, String profileImage) {
         this.createdAt = createdAt;
-        this.own_like = own_like;
+        this.ownLike = ownLike;
         this.name = name;
-        this._id = _id;
+        this._idUser = _idUser;
+        this.idPost = idPost;
         this.message = message;
         this.latitude = latitude;
         this.longitude = longitude;
         this.image = image;
-        this.profile_image = profile_image;
+        this.profileImage = profileImage;
     }
 
-    static Post parse(JSONObject o, String profile_image) throws JSONException {
+    static Post parse(JSONObject o, String profileImage) throws JSONException {
+        String idPost = o.getString(IDPOST);
         Double created_at = o.getDouble(TIMESTAMP);
-        boolean own_like = o.getBoolean(LIKE);
+        boolean ownLike = o.getBoolean(LIKE);
         JSONObject object = o.getJSONObject(CREATED_BY);
         String name = object.getString(NAME);
-        String _id = object.getString(ID);
+        String idUser = object.getString(IDUSER);
         String message = o.optString(MASSAGE);
         object = o.optJSONObject(LOCATION);
         String latitude = "";
@@ -99,6 +112,6 @@ public class Post {
             longitude = object.getString(LONGITUDE);
         }
         String image = o.optString(IMAGE, "");
-        return new Post(created_at, own_like, name, _id, message, latitude, longitude, image, profile_image);
+        return new Post(idPost, created_at, ownLike, name, idUser, message, latitude, longitude, image, profileImage);
     }
 }

@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:onClick="onSave"
             android:text="@string/button_form_submit"
-            android:background="@color/button1"
+            android:background="@color/button_sign_in"
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"

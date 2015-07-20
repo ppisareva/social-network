@@ -18,6 +18,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
+
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
@@ -59,6 +62,7 @@ public class ProfileActivity extends ActionBarActivity {
     public static final String USER_ID_PREFERENCES = "User ID";
     public static final String USER_ID = "_id";
     private static final String POSTS_JSON = "posts";
+    ImageLoader mImageLoader;
 
     String iduser;
 
@@ -78,7 +82,9 @@ public class ProfileActivity extends ActionBarActivity {
         sharedPreferences = getSharedPreferences(PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(USER_ID_PREFERENCES, MODE_PRIVATE);
         iduser = sharedPreferencesUserId.getString(USER_ID, "");
-        adapter = new PostAdapter(this, new ArrayList<Post>());
+        ImageLoader.ImageCache imageCache = new BitmapLruCache();
+        mImageLoader =  new ImageLoader(Volley.newRequestQueue(this), imageCache);
+        adapter = new PostAdapter(this, new ArrayList<Post>(), mImageLoader);
         if (sharedPreferences.contains(ServerAPI.NAME)) {
             loadProfileFromMemory(sharedPreferences);
         } else {
@@ -133,12 +139,11 @@ public class ProfileActivity extends ActionBarActivity {
             name.setText(o.getString(ServerAPI.NAME));
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(ServerAPI.NAME, o.getString(ServerAPI.NAME));
-            int y = calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
+            int y = Utils.calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
             String years = getResources().getQuantityString(R.plurals.years, y, y);
             birthday.setText(years);
             editor.putString(ServerAPI.BIRTHDAY, o.getString(ServerAPI.BIRTHDAY));
-            profileURL = o.getString(ServerAPI.PROF_URL);
-            getBitmap(new URL(profileURL));
+            mImageLoader.get( o.getString(ServerAPI.PROF_URL), ImageLoader.getImageListener(image, 0, 0));
             editor.putString(ServerAPI.PROF_URL, o.getString(ServerAPI.PROF_URL));
             editor.commit();
         } catch (Exception e) {
@@ -154,34 +159,13 @@ public class ProfileActivity extends ActionBarActivity {
         adapter.notifyDataSetChanged();
     }
 
-
-    @Background
-    public void getBitmap(URL url) {
-        try {
-            InputStream in = url.openStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(in);
-            saveImage(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @UiThread
-    public void saveImage(Bitmap bitmap) {
-        image.setImageBitmap(bitmap);
-    }
-
     private void loadProfileFromMemory(SharedPreferences sharedPreferences) {
         name.setText(sharedPreferences.getString(ServerAPI.NAME, ""));
-        int y = calculateAmountYears(sharedPreferences.getString(ServerAPI.BIRTHDAY, ""));
+        int y = Utils.calculateAmountYears(sharedPreferences.getString(ServerAPI.BIRTHDAY, ""));
         String years = getResources().getQuantityString(R.plurals.years, y, y);
         birthday.setText(years);
         profileURL = sharedPreferences.getString(ServerAPI.PROF_URL, "");
-        try {
-            getBitmap(new URL(profileURL));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        mImageLoader.get(profileURL, ImageLoader.getImageListener(image, 0, 0));
     }
 
 
@@ -221,39 +205,6 @@ public class ProfileActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static int calculateAmountYears(String birthday) {
-        Calendar now = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            Date bDate = format.parse(birthday);
-            int bYear = bDate.getYear();
-            int bMonth = bDate.getMonth();
-            int bDay = bDate.getDay();
-
-            Date nowDate = now.getTime();
-            int nowYear = nowDate.getYear();
-            int nowMonth = nowDate.getMonth();
-            int nowDay = nowDate.getDay();
-
-            int year = nowYear - bYear - 1;
-
-            if (bMonth < nowMonth) {
-                year++;
-            }
-            if (bMonth == nowMonth) {
-                if (bDay < nowDay) {
-                    year++;
-                }
-            }
-
-            return year;
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return 0;
-        }
-
-    }
 
 }
 

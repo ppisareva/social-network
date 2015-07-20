@@ -29,12 +29,13 @@ import java.util.List;
  * Created by polina on 04.06.15.
  */
 public class ServerAPI implements API {
-    private static String HOST = "https://socialnetwork-core-rest.herokuapp.com/";
+    public static String HOST = "https://socialnetwork-core-rest.herokuapp.com/";
     private String logInPath = HOST + "user/login";
     private String sighUpPath = HOST + "user/register";
     private String userInfoPath = HOST + "/user/me";
     private String postPath = HOST + "/post";
     private String postGetPath = HOST + "/timeline/";
+
 
 
     private static final String MAIL = "email";
@@ -48,6 +49,7 @@ public class ServerAPI implements API {
     public static final String POST_LOCATION = "location";
     public static final String POST_IMAGE = "image";
     public static final String POST_MASSAGE = "massage";
+
 
     @Override
     public JSONObject logIn(String email, String password, Context context) {

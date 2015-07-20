@@ -97,7 +97,7 @@ public class FormActivity extends Activity {
 
                 twname.setText(o.getString(ServerAPI.NAME));
 
-                int y = ProfileActivity.calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
+                int y = Utils.calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
                 String years = getResources().getQuantityString(R.plurals.years, y, y);
                 twbithday.setText(years);
                 String profileURL = o.getString(ServerAPI.PROF_URL);
@@ -107,12 +107,12 @@ public class FormActivity extends Activity {
                 sex = o.getString(ServerAPI.SEX);
                 twsex.setText(sex);
                 System.err.println("on load " + birthday);
-                System.err.println("on load "+sex);
+                System.err.println("on load " + sex);
                 getBitmap(new URL(profileURL));
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(ServerAPI.NAME, o.getString(ServerAPI.NAME));
                 editor.putString(ServerAPI.BIRTHDAY, o.getString(ServerAPI.BIRTHDAY));
-                editor.putString(ServerAPI.PROF_URL,o.getString(ServerAPI.PROF_URL));
+                editor.putString(ServerAPI.PROF_URL, o.getString(ServerAPI.PROF_URL));
                 editor.commit();
 
 
@@ -121,8 +121,9 @@ public class FormActivity extends Activity {
             }
         }
     }
+
     @Background
-    public void getBitmap(URL url){
+    public void getBitmap(URL url) {
         try {
             InputStream in = url.openStream();
             Bitmap bitmap = BitmapFactory.decodeStream(in);
@@ -133,23 +134,23 @@ public class FormActivity extends Activity {
     }
 
     @UiThread
-    public void saveImage(Bitmap bitmap){
+    public void saveImage(Bitmap bitmap) {
         twimage.setImageBitmap(bitmap);
     }
 
     protected Dialog onCreateDialog(int id) {
-               if (id == DIALOG_DATE) {
-                        DatePickerDialog tpd = new DatePickerDialog(this, callBackDataDialog, 2000, 01, 01);
-                        return tpd;
-                    }
-                if (id == DIALOG_SEX) {
-                       AlertDialog.Builder adb = new AlertDialog.Builder(this);
-                       adb.setSingleChoiceItems(data, -1, sexClickListener);
-                       adb.setPositiveButton(R.string.ok, sexClickListener);
-                       return adb.create();
-                   }
+        if (id == DIALOG_DATE) {
+            DatePickerDialog tpd = new DatePickerDialog(this, callBackDataDialog, 2000, 01, 01);
+            return tpd;
+        }
+        if (id == DIALOG_SEX) {
+            AlertDialog.Builder adb = new AlertDialog.Builder(this);
+            adb.setSingleChoiceItems(data, -1, sexClickListener);
+            adb.setPositiveButton(R.string.ok, sexClickListener);
+            return adb.create();
+        }
         return super.onCreateDialog(id);
-           }
+    }
 
     public void onDateChoose(View v) {
         showDialog(DIALOG_DATE);
@@ -158,14 +159,14 @@ public class FormActivity extends Activity {
     DatePickerDialog.OnDateSetListener callBackDataDialog = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
-            birthday = dayOfMonth + "/" + monthOfYear + "/" + year;
+            birthday = String.format("%s/%s/%s", dayOfMonth, monthOfYear, year);
             twbithday.setText(birthday);
         }
     };
 
 
     public void onSexChoose(View v) {
-       showDialog(DIALOG_SEX);
+        showDialog(DIALOG_SEX);
     }
 
 
@@ -215,38 +216,35 @@ public class FormActivity extends Activity {
     }
 
     public void onSave(View v) {
-            name = twname.getText().toString();
-        System.err.println("on save"+ birthday);
-            sex = twsex.getText().toString();
-        System.err.println("on save"+ sex);
-
+        name = twname.getText().toString();
+        System.err.println("on save" + birthday);
+        sex = twsex.getText().toString();
+        System.err.println("on save" + sex);
         saveProf();
     }
 
     @Background
     void saveProf() {
 
-            try {
-                if(selectedImage!=null) {
-                    String path = getRealPathFromURI(FormActivity.this, selectedImage);
-                    InputStream inputStream = getThumbnailImage(selectedImage);
-                    image = S3Helper.uploadImage(path);
-                    imagemini = S3Helper.uploadImage(inputStream);
-                }
-                JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
-                System.err.println(o);
-
-                if (o != null) {
-                    Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
-                    startActivity(intent);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            if (selectedImage != null) {
+                String path = getRealPathFromURI(FormActivity.this, selectedImage);
+                InputStream inputStream = getThumbnailImage(selectedImage);
+                image = S3Helper.uploadImage(path);
+                imagemini = S3Helper.uploadImage(inputStream);
             }
+            JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
+            System.err.println(o);
+
+            if (o != null) {
+                Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
+                startActivity(intent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
-
-
 
 
     public InputStream getThumbnailImage(Uri uri) {
