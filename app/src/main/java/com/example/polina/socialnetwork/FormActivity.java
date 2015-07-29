@@ -33,24 +33,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 ;
 
 
 @EActivity(R.layout.form_activity)
 public class FormActivity extends Activity {
-    public static final String NAME = "name";
+
     @ViewById(R.id.form_name)
-    public TextView twname;
+    public TextView tvName;
     @ViewById(R.id.form_birthday)
-    public TextView twbithday;
+    public TextView tvBithday;
     @ViewById(R.id.form_sex)
-    public TextView twsex;
+    public TextView tvSex;
     @ViewById(R.id.form_image)
-    public ImageView twimage;
+    public ImageView tvImage;
     @App
     SNApp snApp;
 
@@ -58,63 +54,50 @@ public class FormActivity extends Activity {
     private String birthday;
     private String sex;
     private String image;
-    private String imagemini;
+    private String imageMini;
     private Uri selectedImage;
-    int DIALOG_DATE = 1;
-    int DIALOG_SEX = 2;
+    SharedPreferences sharedPreferences;
 
-    int RESULT_LOAD_IMAGE = 1;
+    private static int DIALOG_DATE = 1;
+    private static int DIALOG_SEX = 2;
+   private static int RESULT_LOAD_IMAGE = 1;
     private final static String FEMALE = "female";
     private final static String MALE = "male";
-    private final static int WIDTH = 100;
-    private final static int HEIGHT = 100;
     String data[] = {FEMALE, MALE};
-
-    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sharedPreferences = getSharedPreferences(ProfileActivity.PROFILE_PREFERENCES, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         loadProfInfo();
-
     }
 
     @Background
     public void loadProfInfo() {
-
         JSONObject o = snApp.api.getProfile(FormActivity.this);
         addProfileInfo(o);
-
     }
 
     @org.androidannotations.annotations.UiThread
     public void addProfileInfo(JSONObject o) {
-
-
         if (o != null) {
             try {
-
-                twname.setText(o.getString(ServerAPI.NAME));
-
-                int y = Utils.calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
+                tvName.setText(o.getString(Utils.NAME));
+                int y = Utils.calculateAmountYears(o.getString(Utils.BIRTHDAY));
                 String years = getResources().getQuantityString(R.plurals.years, y, y);
-                twbithday.setText(years);
-                String profileURL = o.getString(ServerAPI.PROF_URL);
-                image = o.getString(ServerAPI.PROF_URL);
-                imagemini = o.getString(ServerAPI.MINI_PROF_URL);
-                birthday = o.getString(ServerAPI.BIRTHDAY);
-                sex = o.getString(ServerAPI.SEX);
-                twsex.setText(sex);
-                System.err.println("on load " + birthday);
-                System.err.println("on load " + sex);
+                tvBithday.setText(years);
+                String profileURL = o.getString(Utils.PROF_URL);
+                image = o.getString(Utils.PROF_URL);
+                imageMini = o.getString(Utils.MINI_PROF_URL);
+                birthday = o.getString(Utils.BIRTHDAY);
+                sex = o.getString(Utils.SEX);
+                tvSex.setText(sex);
                 getBitmap(new URL(profileURL));
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(ServerAPI.NAME, o.getString(ServerAPI.NAME));
-                editor.putString(ServerAPI.BIRTHDAY, o.getString(ServerAPI.BIRTHDAY));
-                editor.putString(ServerAPI.PROF_URL, o.getString(ServerAPI.PROF_URL));
+                editor.putString(Utils.NAME, o.getString(Utils.NAME));
+                editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
+                editor.putString(Utils.PROF_URL, o.getString(Utils.PROF_URL));
                 editor.commit();
-
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -135,7 +118,7 @@ public class FormActivity extends Activity {
 
     @UiThread
     public void saveImage(Bitmap bitmap) {
-        twimage.setImageBitmap(bitmap);
+        tvImage.setImageBitmap(bitmap);
     }
 
     protected Dialog onCreateDialog(int id) {
@@ -157,33 +140,28 @@ public class FormActivity extends Activity {
     }
 
     DatePickerDialog.OnDateSetListener callBackDataDialog = new DatePickerDialog.OnDateSetListener() {
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             birthday = String.format("%s/%s/%s", dayOfMonth, monthOfYear, year);
-            twbithday.setText(birthday);
+            tvBithday.setText(birthday);
         }
     };
-
 
     public void onSexChoose(View v) {
         showDialog(DIALOG_SEX);
     }
-
 
     DialogInterface.OnClickListener sexClickListener = new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
             ListView lv = ((AlertDialog) dialog).getListView();
             int pos = lv.getCheckedItemPosition();
             if (pos == 0) {
-                twsex.setText(FEMALE);
+                tvSex.setText(FEMALE);
             } else {
-                twsex.setText(MALE);
+                tvSex.setText(MALE);
             }
-
         }
 
     };
-
 
     public void onImageAdd(View v) {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -193,49 +171,29 @@ public class FormActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             selectedImage = data.getData();
-            twimage.setImageURI(selectedImage);
-        }
-    }
-
-    public static String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] prof = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(contentUri, prof, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            tvImage.setImageURI(selectedImage);
         }
     }
 
     public void onSave(View v) {
-        name = twname.getText().toString();
-        System.err.println("on save" + birthday);
-        sex = twsex.getText().toString();
-        System.err.println("on save" + sex);
+        name = tvName.getText().toString();
+        sex = tvSex.getText().toString();
         saveProf();
     }
 
     @Background
     void saveProf() {
-
         try {
             if (selectedImage != null) {
-                String path = getRealPathFromURI(FormActivity.this, selectedImage);
-                InputStream inputStream = getThumbnailImage(selectedImage);
+                String path = Utils.getRealPathFromURI(FormActivity.this, selectedImage);
+                InputStream inputStream = Utils.getThumbnailImage(selectedImage, FormActivity.this);
                 image = S3Helper.uploadImage(path);
-                imagemini = S3Helper.uploadImage(inputStream);
+                imageMini = S3Helper.uploadImage(inputStream);
             }
-            JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imagemini, FormActivity.this);
+            JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imageMini, FormActivity.this);
             System.err.println(o);
-
             if (o != null) {
                 Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
                 startActivity(intent);
@@ -243,46 +201,5 @@ public class FormActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-    }
-
-
-    public InputStream getThumbnailImage(Uri uri) {
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            System.out.println(bitmap.toString());
-            Bitmap resizedBitmap = getResizedBitmap(bitmap, HEIGHT, WIDTH);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, bos);
-            byte[] bitmapdata = bos.toByteArray();
-            InputStream inputStream = new ByteArrayInputStream(bitmapdata);
-            return inputStream;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-
-        Matrix matrix = new Matrix();
-        Bitmap resizedBitmap;
-
-
-        if (width >= height) {
-            matrix.postScale(scaleHeight, scaleHeight);
-            resizedBitmap = Bitmap.createBitmap(bm, width / 2 - height / 2, 0, height, height, matrix, false);
-        } else {
-            matrix.postScale(scaleWidth, scaleWidth);
-            resizedBitmap = Bitmap.createBitmap(bm, 0, height / 2 - width / 2, width, width, matrix, false);
-        }
-
-        return resizedBitmap;
-
     }
 }

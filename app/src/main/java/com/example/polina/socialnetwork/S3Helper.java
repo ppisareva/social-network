@@ -23,8 +23,6 @@ public class S3Helper {
         AWSCredentials credentials = new BasicAWSCredentials(MY_ACCESS_KEY_ID, MY_SECRET_KEY);
         TransferManager manager = new TransferManager(credentials);
         Upload upload = manager.upload(BUCKET_NAME, "images/IMG_" + System.currentTimeMillis() + ".png", new File(path));
-
-
         try {
             UploadResult r = upload.waitForUploadResult();
             return PATH + r.getBucketName() + "/" + r.getKey();
@@ -32,7 +30,6 @@ public class S3Helper {
             e.printStackTrace();
             return null;
         }
-
     }
 
     public static String uploadImage(InputStream inputStream) {
@@ -43,15 +40,10 @@ public class S3Helper {
         Upload upload = manager.upload(BUCKET_NAME, "images/IMG_" + System.currentTimeMillis() + ".png", inputStream, meta);
         try {
             UploadResult r = upload.waitForUploadResult();
-
-
             return PATH + r.getBucketName() + "/" + r.getKey();
-
-
         } catch (InterruptedException e) {
             e.printStackTrace();
             return null;
         }
-
     }
 }

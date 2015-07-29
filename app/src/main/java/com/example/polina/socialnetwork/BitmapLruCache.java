@@ -39,6 +39,6 @@ public class BitmapLruCache extends LruCache<String, Bitmap>
                         (int) (Runtime.getRuntime().maxMemory() / 1024);
                 final int cacheSize = maxMemory;
 
-                return cacheSize;
+                return cacheSize*512;
         }
 }

@@ -32,5 +32,6 @@
     <string name="shot">take a shot</string>
     <string name="connection_faild">no connection to the internet</string>
     <string name="wait">Please wait...</string>
+    <string name="wrong_login_password">Wrong login or password</string>
 
 </resources>

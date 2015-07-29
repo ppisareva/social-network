@@ -1,9 +1,8 @@
 package com.example.polina.socialnetwork;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 //import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -13,11 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
@@ -30,14 +31,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 @EActivity(R.layout.profile_activity)
 public class ProfileActivity extends ActionBarActivity {
@@ -54,38 +56,39 @@ public class ProfileActivity extends ActionBarActivity {
     public ListView postList;
 
 
-    String profileURL;
-    String connection_faild;
-    SharedPreferences sharedPreferences;
-    SharedPreferences sharedPreferencesUserId;
-    public static final String PROFILE_PREFERENCES = "profile info";
-    public static final String USER_ID_PREFERENCES = "User ID";
-    public static final String USER_ID = "_id";
-    private static final String POSTS_JSON = "posts";
-    ImageLoader mImageLoader;
-
-    String iduser;
-
-
+    private String profileURL;
+    private String connectionFaild;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferencesUserId;
+    private ImageLoader mImageLoader;
+    private String idUser;
+    private String idPost;
     private PostAdapter adapter;
+
+    private static final int NORMAL_LIST_SIZE = 9;
+    private int totalPost = 10;
+    private ArrayList<Post> postsToLoad;
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        postsToLoad = new ArrayList<>();
+        ImageLoader.ImageCache imageCache = new BitmapLruCache();
+        mImageLoader = new ImageLoader(Volley.newRequestQueue(this), imageCache);
+        connectionFaild = getResources().getString(R.string.connection_faild);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        connection_faild = getResources().getString(R.string.connection_faild);
-        sharedPreferences = getSharedPreferences(PROFILE_PREFERENCES, MODE_PRIVATE);
-        sharedPreferencesUserId = getSharedPreferences(USER_ID_PREFERENCES, MODE_PRIVATE);
-        iduser = sharedPreferencesUserId.getString(USER_ID, "");
-        ImageLoader.ImageCache imageCache = new BitmapLruCache();
-        mImageLoader =  new ImageLoader(Volley.newRequestQueue(this), imageCache);
+        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+        sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
+        idUser = sharedPreferencesUserId.getString(Utils.USER_ID, "");
         adapter = new PostAdapter(this, new ArrayList<Post>(), mImageLoader);
-        if (sharedPreferences.contains(ServerAPI.NAME)) {
+        postList.setAdapter(adapter);
+        postList.setOnScrollListener(myScrollListener);
+        if (sharedPreferences.contains(Utils.NAME)) {
             loadProfileFromMemory(sharedPreferences);
         } else {
             loadProfile();
@@ -93,35 +96,59 @@ public class ProfileActivity extends ActionBarActivity {
         loadPost();
     }
 
+    AbsListView.OnScrollListener myScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView absListView, int i) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem,
+                             int visibleItemCount, int totalItemCount) {
+            System.err.println("id" + firstVisibleItem + "itams" + visibleItemCount + "totalItemCount" + totalItemCount);
+            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount != 0) {
+                if (count == 0) {
+                    count++;
+                    loadPostList();
+                }
+            }
+        }
+    };
+
+    @Background
+    public void loadPostList() {
+        System.out.println("------------------------------" + idUser + "    " + idPost);
+        if (!idPost.isEmpty()) {
+            JSONObject objectPosts = snApp.api.getLoadPosts(ProfileActivity.this, idUser, String.valueOf(totalPost), idPost);
+            System.out.println(objectPosts + "-------------------------------------------------");
+            loadPostUIThread(objectPosts);
+            return;
+        }
+    }
 
     @Background
     public void loadPost() {
-        JSONObject objectPosts = snApp.api.getPosts(ProfileActivity.this, iduser);
+        JSONObject objectPosts = snApp.api.getPosts(ProfileActivity.this, idUser);
         loadPostUIThread(objectPosts);
-
-
     }
 
     @org.androidannotations.annotations.UiThread
     public void loadPostUIThread(JSONObject o) {
         if (o != null) {
             try {
-                JSONArray jsonArray = o.getJSONArray(POSTS_JSON);
+                JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
                 ArrayList<Post> posts = new ArrayList<>();
                 JSONObject jsonPost;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     jsonPost = jsonArray.getJSONObject(i);
-                    posts.add(Post.parse(jsonPost, sharedPreferences.getString(ServerAPI.PROF_URL, "")));
+                    posts.add(Post.parse(jsonPost, sharedPreferences.getString(Utils.PROF_URL, "")));
                 }
+                idPost = (posts.size() > NORMAL_LIST_SIZE ? posts.get(NORMAL_LIST_SIZE).getIdPost() : "");
                 updateAdapter(posts);
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            Toast.makeText(ProfileActivity.this, connection_faild, Toast.LENGTH_LONG).show();
         }
     }
-
 
     @Background
     public void loadProfile() {
@@ -129,22 +156,23 @@ public class ProfileActivity extends ActionBarActivity {
         if (o != null) {
             addProfileInfo(o);
         } else {
-            Toast.makeText(ProfileActivity.this, connection_faild, Toast.LENGTH_LONG).show();
+            Toast.makeText(ProfileActivity.this, connectionFaild, Toast.LENGTH_LONG).show();
         }
     }
 
     @org.androidannotations.annotations.UiThread
     public void addProfileInfo(JSONObject o) {
         try {
-            name.setText(o.getString(ServerAPI.NAME));
+            name.setText(o.getString(Utils.NAME));
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(ServerAPI.NAME, o.getString(ServerAPI.NAME));
-            int y = Utils.calculateAmountYears(o.getString(ServerAPI.BIRTHDAY));
+            editor.putString(Utils.NAME, o.getString(Utils.NAME));
+            int y = Utils.calculateAmountYears(o.getString(Utils.BIRTHDAY));
             String years = getResources().getQuantityString(R.plurals.years, y, y);
             birthday.setText(years);
-            editor.putString(ServerAPI.BIRTHDAY, o.getString(ServerAPI.BIRTHDAY));
-            mImageLoader.get( o.getString(ServerAPI.PROF_URL), ImageLoader.getImageListener(image, 0, 0));
-            editor.putString(ServerAPI.PROF_URL, o.getString(ServerAPI.PROF_URL));
+            editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
+            System.err.println(o.getString(Utils.PROF_URL));
+            mImageLoader.get(o.getString(Utils.PROF_URL), ImageLoader.getImageListener(image, 0, 0));
+            editor.putString(Utils.PROF_URL, o.getString(Utils.PROF_URL));
             editor.commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,19 +181,30 @@ public class ProfileActivity extends ActionBarActivity {
 
     @UiThread
     public void updateAdapter(ArrayList<Post> posts) {
-        postList.setAdapter(adapter);
-        adapter.clear();
         adapter.addAll(posts);
         adapter.notifyDataSetChanged();
+        postsToLoad.addAll(posts);
+        count = 0;
     }
 
     private void loadProfileFromMemory(SharedPreferences sharedPreferences) {
-        name.setText(sharedPreferences.getString(ServerAPI.NAME, ""));
-        int y = Utils.calculateAmountYears(sharedPreferences.getString(ServerAPI.BIRTHDAY, ""));
+        name.setText(sharedPreferences.getString(Utils.NAME, ""));
+        int y = Utils.calculateAmountYears(sharedPreferences.getString(Utils.BIRTHDAY, ""));
         String years = getResources().getQuantityString(R.plurals.years, y, y);
         birthday.setText(years);
-        profileURL = sharedPreferences.getString(ServerAPI.PROF_URL, "");
-        mImageLoader.get(profileURL, ImageLoader.getImageListener(image, 0, 0));
+        profileURL = sharedPreferences.getString(Utils.PROF_URL, "");
+        mImageLoader.get(profileURL, ImageLoader.getImageListener(image, R.drawable.load, R.drawable.error));
+        mImageLoader.get(profileURL, new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.err.println("------------------------- " + error);
+            }
+        });
+        System.out.println(profileURL + " --------------------------");
     }
 
 
@@ -179,7 +218,6 @@ public class ProfileActivity extends ActionBarActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
-
     }
 
     @Override
@@ -201,11 +239,8 @@ public class ProfileActivity extends ActionBarActivity {
                 startActivity(intent);
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-
 }
 
 

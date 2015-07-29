@@ -16,5 +16,6 @@ public class ViewHolder {
     ImageView imagePost;
     CheckBox checkBoxLike;
     ImageView location;
+    Post post;
 
  }

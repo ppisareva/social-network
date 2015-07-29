@@ -15,5 +15,7 @@ public interface API {
     public  JSONObject getProfile(Context context);
     public JSONObject newPost (Context context, String massage, JSONObject location,  String image, String account);
     public JSONObject getPosts(Context context, String id);
+    public JSONObject getLoadPosts(Context context, String idUser, String size, String idPost);
+
 
 }
