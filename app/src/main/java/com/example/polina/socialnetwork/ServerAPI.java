@@ -1,12 +1,8 @@
 package com.example.polina.socialnetwork;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Xml;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-
-import com.amazonaws.org.apache.http.util.EncodingUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -19,7 +15,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -35,26 +30,14 @@ public class ServerAPI implements API {
     private String userInfoPath = HOST + "/user/me";
     private String postPath = HOST + "/post";
     private String postGetPath = HOST + "/timeline/";
-
-
-
+    private String postLoadPost = "?limit=%d&before=%s";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
-    public static final String NAME = "name";
-    public static final String BIRTHDAY = "birthday";
-    public static final String SEX = "sex";
-    public static final String PROF_URL = "profile_url";
-    public static final String MINI_PROF_URL = "mini_profile_url";
-    public static final String POST_ACCOUNT = "account";
-    public static final String POST_LOCATION = "location";
-    public static final String POST_IMAGE = "image";
-    public static final String POST_MASSAGE = "massage";
 
 
     @Override
     public JSONObject logIn(String email, String password, Context context) {
         return logInSignUp(email, password, logInPath, context);
-
     }
 
     @Override
@@ -66,11 +49,11 @@ public class ServerAPI implements API {
     public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl, Context context) {
         JSONObject o = new JSONObject();
         try {
-            o.put(NAME, name);
-            o.put(BIRTHDAY, birthday);
-            o.put(SEX, sex);
-            o.put(PROF_URL, imageUrl);
-            o.put(MINI_PROF_URL, imageMiniUrl);
+            o.put(Utils.NAME, name);
+            o.put(Utils.BIRTHDAY, birthday);
+            o.put(Utils.SEX, sex);
+            o.put(Utils.PROF_URL, imageUrl);
+            o.put(Utils.MINI_PROF_URL, imageMiniUrl);
             return postRequest(context, o, userInfoPath);
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,22 +87,22 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getPosts(Context context, String id) {
-        return getRequest(context, postGetPath + id);
+    public JSONObject getLoadPosts(Context context, String idUser, int size,  String idPost) {
+        if(idPost.isEmpty()){
+            return getRequest(context, postGetPath + idUser);
+        }
+        return getRequest(context, postGetPath + idUser + String.format(postLoadPost, size, idPost));
     }
-
 
     private JSONObject logInSignUp(String email, String password, String path, Context context) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(path);
             List<NameValuePair> nameValuePairs = new ArrayList(2);
-
             nameValuePairs.add(new BasicNameValuePair(MAIL, email));
             nameValuePairs.add(new BasicNameValuePair(PASSWORD, password));
             post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
             HttpResponse resp = client.execute(post);
-
             if (resp.getStatusLine().getStatusCode() < 400) {
                 List<Cookie> cookies = client.getCookieStore().getCookies();
                 CookieSyncManager.createInstance(context);
@@ -138,7 +121,6 @@ public class ServerAPI implements API {
                 System.err.println("ERROR: " + resp.getStatusLine());
                 return null;
             }
-
         } catch (Exception e1) {
             e1.printStackTrace();
             return null;
@@ -153,10 +135,8 @@ public class ServerAPI implements API {
             CookieManager cookieManager = CookieManager.getInstance();
             post.addHeader("Cookie", cookieManager.getCookie(path));
             String data = o.toString();
-
             post.setEntity(new StringEntity(data, HTTP.UTF_8));
             HttpResponse resp = client.execute(post);
-
             if (resp.getStatusLine().getStatusCode() < 400) {
                 String s = EntityUtils.toString(resp.getEntity());
                 return new JSONObject(s);
@@ -169,19 +149,15 @@ public class ServerAPI implements API {
 
     public JSONObject newPost(Context context, String massage, JSONObject location, String image, String account) {
         JSONObject o = new JSONObject();
-
         try {
-            o.put(POST_MASSAGE, massage);
-            o.put(POST_LOCATION, location);
-            o.put(POST_IMAGE, image);
-            o.put(POST_ACCOUNT, account);
+            o.put(Utils.POST_MASSAGE, massage);
+            o.put(Utils.POST_LOCATION, location);
+            o.put(Utils.POST_IMAGE, image);
+            o.put(Utils.POST_ACCOUNT, account);
             return postRequest(context, o, postPath);
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
-
 }

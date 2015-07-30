@@ -20,14 +20,13 @@ public class SignInActivity extends Activity {
     @ViewById(R.id.password_sign_in)
     public TextView pw;
     @ViewById(R.id.sign_in_faild)
-    public TextView signInFaild;
-    private String email;
-    private String password;
-    SharedPreferences sharedPreferencesUserId;
-
+    public TextView signInFailed;
     @App
     SNApp snApp;
 
+    private String email;
+    private String password;
+    SharedPreferences sharedPreferencesUserId;
 
     public void signIn(View v) {
         email = em.getText().toString();
@@ -43,26 +42,24 @@ public class SignInActivity extends Activity {
 
     @org.androidannotations.annotations.UiThread
     void checkData(JSONObject o) {
-        sharedPreferencesUserId = getSharedPreferences(ProfileActivity.USER_ID_PREFERENCES, MODE_PRIVATE);
+        sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         try {
             SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
-            ed.putString(ProfileActivity.USER_ID, o.getString(ProfileActivity.USER_ID));
+            ed.putString(Utils.USER_ID, o.getString(Utils.USER_ID));
             ed.commit();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         Intent intent;
         if (o == null) {
-            signInFaild.setText("Wrong login or password");
+            signInFailed.setText(R.string.wrong_login_password);
         } else {
-            if (!o.has(FormActivity.NAME)) {
+            if (!o.has(Utils.NAME)) {
                 intent = new Intent(SignInActivity.this, FormActivity_.class);
             } else {
                 intent = new Intent(SignInActivity.this, ProfileActivity_.class);
             }
             startActivity(intent);
         }
-
     }
 }

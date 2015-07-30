@@ -3,9 +3,6 @@ package com.example.polina.socialnetwork;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.annotation.UiThread;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,21 +15,22 @@ import org.json.JSONObject;
 
 @EActivity(R.layout.registration)
 public class SignUpActivity extends Activity {
-    private String email;
-    private String password;
-    private String passwordToConfirm;
+
     @ViewById(R.id.email_sign_up)
-    public TextView e;
+    public TextView tvEmail;
     @ViewById(R.id.password_sign_up1)
-    public TextView pw1;
+    public TextView tvPass1;
     @ViewById(R.id.password_sign_up2)
-    public TextView pw2;
+    public TextView tvPass2;
     @ViewById(R.id.registration_feild)
     public TextView registrationFail;
     @App
     SNApp snApp;
 
     SharedPreferences sharedPreferencesUserId;
+    private String email;
+    private String password;
+    private String passwordToConfirm;
 
     @Background
     void signUpData() {
@@ -42,11 +40,10 @@ public class SignUpActivity extends Activity {
 
     @org.androidannotations.annotations.UiThread
     void check(JSONObject o) {
-        sharedPreferencesUserId =  getSharedPreferences(ProfileActivity.USER_ID_PREFERENCES, MODE_PRIVATE);
-
+        sharedPreferencesUserId =  getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
             try {
                 SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
-                ed.putString(ProfileActivity.USER_ID, o.getString(ProfileActivity.USER_ID) );
+                ed.putString(Utils.USER_ID, o.getString(Utils.USER_ID));
                 ed.commit();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -62,9 +59,9 @@ public class SignUpActivity extends Activity {
     }
 
     public void signUp(View v) {
-        email = e.getText().toString();
-        password = pw1.getText().toString();
-        passwordToConfirm = pw2.getText().toString();
+        email = tvEmail.getText().toString();
+        password = tvPass1.getText().toString();
+        passwordToConfirm = tvPass2.getText().toString();
         if (password.equals(passwordToConfirm)) {
             signUpData();
         }

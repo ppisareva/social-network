@@ -1,41 +1,26 @@
 package com.example.polina.socialnetwork;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.App;
@@ -62,23 +47,25 @@ public class CreatePostActivity extends ActionBarActivity {
     ImageView account_attached;
     Uri attachedImage;
 
-    private static int RESULT_LOAD_IMAGE = 2;
-    private static int TAKE_PICTURE = 1;
-    private static int DIALOG_IMAGE = 1;
+    private static final int RESULT_LOAD_IMAGE = 2;
+    private static final int TAKE_PICTURE = 1;
+    private static final int DIALOG_IMAGE = 1;
+    private static final String pictureName = "Pic.jpg";
 
-    String massage;
-    String account;
-    String image;
-    Location location;
-    JSONObject jsonLocation;
-    String data[];
-    String connection_faild;
+    private String massage;
+    private String account;
+    private String image;
+    private Location location;
+    private JSONObject jsonLocation;
+    private String data[];
+    private String connection_failed;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         data = new String[]{getResources().getString(R.string.gallary), getResources().getString(R.string.shot)};
-        connection_faild = getResources().getString(R.string.connection_faild);
+        connection_failed = getResources().getString(R.string.connection_faild);
     }
 
     protected Dialog onCreateDialog(int id) {
@@ -98,7 +85,7 @@ public class CreatePostActivity extends ActionBarActivity {
                 startActivityForResult(intent, RESULT_LOAD_IMAGE);
             } else {
                 intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
+                File photo = new File(Environment.getExternalStorageDirectory(), pictureName);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
                 attachedImage = Uri.fromFile(photo);
                 startActivityForResult(intent, TAKE_PICTURE);
@@ -110,7 +97,6 @@ public class CreatePostActivity extends ActionBarActivity {
     public void onImageAttach(View v) {
         showDialog(DIALOG_IMAGE);
     }
-
 
     public void onLocationAttach(View v) throws JSONException {
         LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -137,37 +123,35 @@ public class CreatePostActivity extends ActionBarActivity {
 
             }
         };
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
-        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        jsonLocation = new JSONObject();
-        jsonLocation.put("longitude", location.getLongitude());
-        jsonLocation.put("latitude", location.getLatitude());
-        Log.d("Location", location.toString());
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+        location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location == null) {
+            location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+        if (location == null) {
+            location = mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        }
         post_location.setImageResource(R.drawable.ic_room_black_48dp);
-        System.err.println("location" + jsonLocation.toString());
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RESULT_LOAD_IMAGE && data != null) {
             loadImage(data);
         }
         if (requestCode == TAKE_PICTURE) {
             loadImage(attachedImage);
             postImage.setVisibility(View.VISIBLE);
-
             postImage.setImageURI(attachedImage);
         }
-
     }
 
     @Background
     public void loadImage(Intent data) {
         attachedImage = data.getData();
-        String path = FormActivity.getRealPathFromURI(CreatePostActivity.this, attachedImage);
+        String path = Utils.getRealPathFromURI(CreatePostActivity.this, attachedImage);
         loadImageInBackground(path);
     }
 
@@ -177,7 +161,6 @@ public class CreatePostActivity extends ActionBarActivity {
         System.err.println("image " + image);
         postImage.setVisibility(View.VISIBLE);
         postImage.setImageURI(attachedImage);
-
     }
 
     @Background
@@ -191,9 +174,17 @@ public class CreatePostActivity extends ActionBarActivity {
     public void sendPost() {
         sendingPost();
         massage = text.getText().toString();
+        if (location != null) {
+            jsonLocation = new JSONObject();
+            try {
+                jsonLocation.put(Utils.LONGITUDE, location.getLongitude());
+                jsonLocation.put(Utils.LATITUDE, location.getLatitude());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         JSONObject o = snApp.api.newPost(this, massage, jsonLocation, image, account);
-        System.err.println("Image not choose" + image);
-        if (o != null) {
+               if (o != null) {
             Intent intent = new Intent(this, ProfileActivity_.class);
             startActivity(intent);
         }
@@ -213,7 +204,6 @@ public class CreatePostActivity extends ActionBarActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -224,7 +214,7 @@ public class CreatePostActivity extends ActionBarActivity {
                 if (isNetworkAvailable()) {
                     sendPost();
                 } else {
-                    Toast.makeText(CreatePostActivity.this, connection_faild, Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreatePostActivity.this, connection_failed, Toast.LENGTH_LONG).show();
                 }
                 break;
         }
