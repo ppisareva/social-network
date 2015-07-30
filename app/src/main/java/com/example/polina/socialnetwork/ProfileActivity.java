@@ -1,11 +1,11 @@
 package com.example.polina.socialnetwork;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-//import android.support.v7.app.ActionBarActivity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.LruCache;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,28 +17,19 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
-
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.sql.SQLOutput;
+import java.net.URL;
 import java.util.ArrayList;
 
 @EActivity(R.layout.profile_activity)
@@ -49,7 +40,7 @@ public class ProfileActivity extends ActionBarActivity {
     @ViewById(R.id.prof_bday)
     public TextView birthday;
     @ViewById(R.id.prof_image)
-    public ImageView image;
+    public NetworkImageView image;
     @ViewById(R.id.prof_name)
     public TextView name;
     @ViewById(R.id.posts_list)
@@ -57,7 +48,7 @@ public class ProfileActivity extends ActionBarActivity {
 
 
     private String profileURL;
-    private String connectionFaild;
+    private String connectionFailed;
     private SharedPreferences sharedPreferences;
     private SharedPreferences sharedPreferencesUserId;
     private ImageLoader mImageLoader;
@@ -67,33 +58,41 @@ public class ProfileActivity extends ActionBarActivity {
 
     private static final int NORMAL_LIST_SIZE = 9;
     private int totalPost = 10;
-    private ArrayList<Post> postsToLoad;
-    private int count = 0;
+    private boolean loadingNow = true;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        postsToLoad = new ArrayList<>();
-        ImageLoader.ImageCache imageCache = new BitmapLruCache();
-        mImageLoader = new ImageLoader(Volley.newRequestQueue(this), imageCache);
-        connectionFaild = getResources().getString(R.string.connection_faild);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+    @AfterViews
+    protected void init(){
+        postList.setAdapter(adapter);
+        postList.setOnScrollListener(myScrollListener);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         idUser = sharedPreferencesUserId.getString(Utils.USER_ID, "");
-        adapter = new PostAdapter(this, new ArrayList<Post>(), mImageLoader);
-        postList.setAdapter(adapter);
-        postList.setOnScrollListener(myScrollListener);
         if (sharedPreferences.contains(Utils.NAME)) {
             loadProfileFromMemory(sharedPreferences);
         } else {
             loadProfile();
         }
         loadPost();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mImageLoader = new ImageLoader(Volley.newRequestQueue(this), new ImageLoader.ImageCache() {
+            private final LruCache<String, Bitmap> mCache = new LruCache<>(40);
+
+            @Override
+            public Bitmap getBitmap(String url) {
+                return mCache.get(url);
+            }
+
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+                mCache.put(url, bitmap);
+            }
+        });
+        adapter = new PostAdapter(this, new ArrayList<Post>(), mImageLoader);
+        connectionFailed = getResources().getString(R.string.connection_faild);
     }
 
     AbsListView.OnScrollListener myScrollListener = new AbsListView.OnScrollListener() {
@@ -106,8 +105,8 @@ public class ProfileActivity extends ActionBarActivity {
                              int visibleItemCount, int totalItemCount) {
             System.err.println("id" + firstVisibleItem + "itams" + visibleItemCount + "totalItemCount" + totalItemCount);
             if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount != 0) {
-                if (count == 0) {
-                    count++;
+                if (loadingNow) {
+                    loadingNow = false;
                     loadPostList();
                 }
             }
@@ -118,7 +117,7 @@ public class ProfileActivity extends ActionBarActivity {
     public void loadPostList() {
         System.out.println("------------------------------" + idUser + "    " + idPost);
         if (!idPost.isEmpty()) {
-            JSONObject objectPosts = snApp.api.getLoadPosts(ProfileActivity.this, idUser, String.valueOf(totalPost), idPost);
+            JSONObject objectPosts = snApp.api.getLoadPosts(ProfileActivity.this, idUser, totalPost, idPost);
             System.out.println(objectPosts + "-------------------------------------------------");
             loadPostUIThread(objectPosts);
             return;
@@ -127,7 +126,7 @@ public class ProfileActivity extends ActionBarActivity {
 
     @Background
     public void loadPost() {
-        JSONObject objectPosts = snApp.api.getPosts(ProfileActivity.this, idUser);
+        JSONObject objectPosts = snApp.api.getLoadPosts(ProfileActivity.this, idUser, totalPost, "");
         loadPostUIThread(objectPosts);
     }
 
@@ -140,7 +139,7 @@ public class ProfileActivity extends ActionBarActivity {
                 JSONObject jsonPost;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     jsonPost = jsonArray.getJSONObject(i);
-                    posts.add(Post.parse(jsonPost, sharedPreferences.getString(Utils.PROF_URL, "")));
+                    posts.add(Post.parse(jsonPost));
                 }
                 idPost = (posts.size() > NORMAL_LIST_SIZE ? posts.get(NORMAL_LIST_SIZE).getIdPost() : "");
                 updateAdapter(posts);
@@ -156,7 +155,7 @@ public class ProfileActivity extends ActionBarActivity {
         if (o != null) {
             addProfileInfo(o);
         } else {
-            Toast.makeText(ProfileActivity.this, connectionFaild, Toast.LENGTH_LONG).show();
+            Toast.makeText(ProfileActivity.this, connectionFailed, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -171,7 +170,7 @@ public class ProfileActivity extends ActionBarActivity {
             birthday.setText(years);
             editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
             System.err.println(o.getString(Utils.PROF_URL));
-            mImageLoader.get(o.getString(Utils.PROF_URL), ImageLoader.getImageListener(image, 0, 0));
+            image.setImageUrl(o.getString(Utils.PROF_URL), mImageLoader);
             editor.putString(Utils.PROF_URL, o.getString(Utils.PROF_URL));
             editor.commit();
         } catch (Exception e) {
@@ -183,8 +182,7 @@ public class ProfileActivity extends ActionBarActivity {
     public void updateAdapter(ArrayList<Post> posts) {
         adapter.addAll(posts);
         adapter.notifyDataSetChanged();
-        postsToLoad.addAll(posts);
-        count = 0;
+        loadingNow = true;
     }
 
     private void loadProfileFromMemory(SharedPreferences sharedPreferences) {
@@ -193,20 +191,9 @@ public class ProfileActivity extends ActionBarActivity {
         String years = getResources().getQuantityString(R.plurals.years, y, y);
         birthday.setText(years);
         profileURL = sharedPreferences.getString(Utils.PROF_URL, "");
-        mImageLoader.get(profileURL, ImageLoader.getImageListener(image, R.drawable.load, R.drawable.error));
-        mImageLoader.get(profileURL, new ImageLoader.ImageListener() {
-            @Override
-            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-            }
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.err.println("------------------------- " + error);
-            }
-        });
+        image.setImageUrl(profileURL, mImageLoader);
         System.out.println(profileURL + " --------------------------");
     }
-
 
     public void onPost(View v) {
         Intent intent = new Intent(this, CreatePostActivity_.class);
@@ -241,6 +228,6 @@ public class ProfileActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-}
+   }
 
 

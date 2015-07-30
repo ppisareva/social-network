@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Network;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -23,6 +24,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -46,7 +48,6 @@ public class PostAdapter extends ArrayAdapter<Post> {
     ImageLoader mImageLoader;
     RequestQueue queue;
     ViewHolder holder;
-    SNApp snApp = new SNApp();
 
     public PostAdapter(Context context, List<Post> objects, ImageLoader mImageLoader) {
         super(context, R.layout.post_list, objects);
@@ -64,18 +65,17 @@ public class PostAdapter extends ArrayAdapter<Post> {
             view = layoutInflater.inflate(R.layout.post_list, parent, false);
             holder = new ViewHolder();
             holder.checkBoxLike = (CheckBox) view.findViewById(R.id.like_chack_box);
-            holder.imagePost = (ImageView) view.findViewById(R.id.attached_image);
-            holder.imageUser = (ImageView) view.findViewById(R.id.user_image);
+            holder.imagePost = (NetworkImageView) view.findViewById(R.id.attached_image);
+            holder.imageUser = (NetworkImageView) view.findViewById(R.id.user_image);
             holder.location = (ImageView) view.findViewById(R.id.image_lication);
             holder.postDate = (TextView) view.findViewById(R.id.time_stamp);
             holder.postText = (TextView) view.findViewById(R.id.post_text);
             holder.userName = (TextView) view.findViewById(R.id.user_name);
-            holder.post = post;
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
         }
-        mImageLoader.get(post.getProfileImage(), ImageLoader.getImageListener(holder.imageUser, 0, 0));
+        holder.imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
         holder.userName.setText(post.getName());
         Date date = new Date((long) post.getCreatedAt() * 1000);
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy  HH:mm");
@@ -84,7 +84,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         holder.imagePost.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(post.getImage())) {
             holder.imagePost.setVisibility(View.VISIBLE);
-            mImageLoader.get(post.getImage(), ImageLoader.getImageListener(holder.imagePost, 0, 0));
+            holder.imagePost.setImageUrl(post.getImage(), mImageLoader);
         }
 
         holder.checkBoxLike.setOnCheckedChangeListener(null);

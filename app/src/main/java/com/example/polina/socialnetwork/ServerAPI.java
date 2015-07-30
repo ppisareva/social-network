@@ -1,12 +1,8 @@
 package com.example.polina.socialnetwork;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Xml;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-
-import com.amazonaws.org.apache.http.util.EncodingUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -19,7 +15,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -35,8 +30,7 @@ public class ServerAPI implements API {
     private String userInfoPath = HOST + "/user/me";
     private String postPath = HOST + "/post";
     private String postGetPath = HOST + "/timeline/";
-    private String postLoadPostSize = "?limit=";
-    private String postLoadPath = "&before=";
+    private String postLoadPost = "?limit=%d&before=%s";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
 
@@ -93,13 +87,11 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getPosts(Context context, String id) {
-        return getRequest(context, postGetPath + id);
-    }
-
-    @Override
-    public JSONObject getLoadPosts(Context context, String idUser, String size,  String idPost) {
-        return getRequest(context, postGetPath + idUser + postLoadPostSize + size + postLoadPath + idPost);
+    public JSONObject getLoadPosts(Context context, String idUser, int size,  String idPost) {
+        if(idPost.isEmpty()){
+            return getRequest(context, postGetPath + idUser);
+        }
+        return getRequest(context, postGetPath + idUser + String.format(postLoadPost, size, idPost));
     }
 
     private JSONObject logInSignUp(String email, String password, String path, Context context) {

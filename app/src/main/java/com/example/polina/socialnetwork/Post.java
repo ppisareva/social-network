@@ -79,13 +79,14 @@ public class Post implements Serializable {
         this.profileImage = profileImage;
     }
 
-    static Post parse(JSONObject o, String profileImage) throws JSONException {
+    static Post parse(JSONObject o) throws JSONException {
         String idPost = o.getString(Utils.IDPOST);
         Double created_at = o.getDouble(Utils.TIMESTAMP);
         boolean ownLike = o.getBoolean(Utils.LIKE);
         JSONObject object = o.getJSONObject(Utils.CREATED_BY);
         String name = object.getString(Utils.NAME);
         String idUser = object.getString(Utils.IDUSER);
+        String profileImage = object.getString(Utils.MINI_PROF_URL);
         String message = o.optString(Utils.MASSAGE);
         object = o.optJSONObject(Utils.LOCATION);
         String latitude = "";

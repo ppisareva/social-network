@@ -4,18 +4,19 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
+
 /**
  * Created by polina on 20.07.15.
  */
 public class ViewHolder {
 
-    ImageView imageUser;
+    NetworkImageView imageUser;
     TextView userName;
     TextView postDate;
     TextView postText;
-    ImageView imagePost;
+    NetworkImageView imagePost;
     CheckBox checkBoxLike;
     ImageView location;
-    Post post;
 
  }

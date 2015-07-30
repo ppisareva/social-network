@@ -12,14 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <com.android.volley.toolbox.NetworkImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:id="@+id/prof_image"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:scaleType="centerCrop"
-            android:focusableInTouchMode="false" />
+            android:focusableInTouchMode="false"
+            />
 
         <LinearLayout
             android:orientation="vertical"

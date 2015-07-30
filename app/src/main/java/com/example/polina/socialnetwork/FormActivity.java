@@ -4,17 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -28,9 +24,6 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 ;
@@ -40,21 +33,18 @@ import java.net.URL;
 public class FormActivity extends Activity {
 
     @ViewById(R.id.form_name)
-    public TextView tvName;
+    public TextView name;
     @ViewById(R.id.form_birthday)
-    public TextView tvBithday;
+    public TextView birthday;
     @ViewById(R.id.form_sex)
-    public TextView tvSex;
+    public TextView sex;
     @ViewById(R.id.form_image)
-    public ImageView tvImage;
+    public ImageView profilePhoto;
     @App
     SNApp snApp;
 
-    private String name;
-    private String birthday;
-    private String sex;
-    private String image;
-    private String imageMini;
+    private String imageURI;
+    private String miniImageURI;
     private Uri selectedImage;
     SharedPreferences sharedPreferences;
 
@@ -82,17 +72,15 @@ public class FormActivity extends Activity {
     public void addProfileInfo(JSONObject o) {
         if (o != null) {
             try {
-                tvName.setText(o.getString(Utils.NAME));
+                name.setText(o.getString(Utils.NAME));
                 int y = Utils.calculateAmountYears(o.getString(Utils.BIRTHDAY));
                 String years = getResources().getQuantityString(R.plurals.years, y, y);
-                tvBithday.setText(years);
+                birthday.setText(years);
                 String profileURL = o.getString(Utils.PROF_URL);
-                image = o.getString(Utils.PROF_URL);
-                imageMini = o.getString(Utils.MINI_PROF_URL);
-                birthday = o.getString(Utils.BIRTHDAY);
-                sex = o.getString(Utils.SEX);
-                tvSex.setText(sex);
-                getBitmap(new URL(profileURL));
+                imageURI = o.getString(Utils.PROF_URL);
+                miniImageURI = o.getString(Utils.MINI_PROF_URL);
+                sex.setText(o.getString(Utils.SEX));
+                saveProfileImage(new URL(profileURL));
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(Utils.NAME, o.getString(Utils.NAME));
                 editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
@@ -106,7 +94,7 @@ public class FormActivity extends Activity {
     }
 
     @Background
-    public void getBitmap(URL url) {
+    public void saveProfileImage(URL url) {
         try {
             InputStream in = url.openStream();
             Bitmap bitmap = BitmapFactory.decodeStream(in);
@@ -118,7 +106,7 @@ public class FormActivity extends Activity {
 
     @UiThread
     public void saveImage(Bitmap bitmap) {
-        tvImage.setImageBitmap(bitmap);
+        profilePhoto.setImageBitmap(bitmap);
     }
 
     protected Dialog onCreateDialog(int id) {
@@ -141,8 +129,7 @@ public class FormActivity extends Activity {
 
     DatePickerDialog.OnDateSetListener callBackDataDialog = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            birthday = String.format("%s/%s/%s", dayOfMonth, monthOfYear, year);
-            tvBithday.setText(birthday);
+            birthday.setText(String.format("%s/%s/%s", dayOfMonth, monthOfYear, year));
         }
     };
 
@@ -155,9 +142,9 @@ public class FormActivity extends Activity {
             ListView lv = ((AlertDialog) dialog).getListView();
             int pos = lv.getCheckedItemPosition();
             if (pos == 0) {
-                tvSex.setText(FEMALE);
+                sex.setText(FEMALE);
             } else {
-                tvSex.setText(MALE);
+                sex.setText(MALE);
             }
         }
 
@@ -173,13 +160,11 @@ public class FormActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             selectedImage = data.getData();
-            tvImage.setImageURI(selectedImage);
+            profilePhoto.setImageURI(selectedImage);
         }
     }
 
     public void onSave(View v) {
-        name = tvName.getText().toString();
-        sex = tvSex.getText().toString();
         saveProf();
     }
 
@@ -189,10 +174,10 @@ public class FormActivity extends Activity {
             if (selectedImage != null) {
                 String path = Utils.getRealPathFromURI(FormActivity.this, selectedImage);
                 InputStream inputStream = Utils.getThumbnailImage(selectedImage, FormActivity.this);
-                image = S3Helper.uploadImage(path);
-                imageMini = S3Helper.uploadImage(inputStream);
+                imageURI = S3Helper.uploadImage(path);
+                miniImageURI = S3Helper.uploadImage(inputStream);
             }
-            JSONObject o = snApp.api.saveProfile(name, birthday, sex, image, imageMini, FormActivity.this);
+            JSONObject o = snApp.api.saveProfile(name.getText().toString(), birthday.getText().toString(), sex.getText().toString(), imageURI, miniImageURI, FormActivity.this);
             System.err.println(o);
             if (o != null) {
                 Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
