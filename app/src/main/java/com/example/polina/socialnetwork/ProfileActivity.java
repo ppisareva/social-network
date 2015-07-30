@@ -6,10 +6,12 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.LruCache;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.AbsListView;
@@ -37,15 +39,12 @@ public class ProfileActivity extends ActionBarActivity {
 
     @App
     SNApp snApp;
-    @ViewById(R.id.prof_bday)
-    public TextView birthday;
-    @ViewById(R.id.prof_image)
-    public NetworkImageView image;
-    @ViewById(R.id.prof_name)
-    public TextView name;
     @ViewById(R.id.posts_list)
     public ListView postList;
-
+    public TextView birthday;
+    public NetworkImageView image;
+    public TextView name;
+    ViewGroup header;
 
     private String profileURL;
     private String connectionFailed;
@@ -62,8 +61,10 @@ public class ProfileActivity extends ActionBarActivity {
 
     @AfterViews
     protected void init(){
+
         postList.setAdapter(adapter);
         postList.setOnScrollListener(myScrollListener);
+        postList.addHeaderView(header, null, false);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         idUser = sharedPreferencesUserId.getString(Utils.USER_ID, "");
@@ -78,6 +79,12 @@ public class ProfileActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LayoutInflater inflater = getLayoutInflater();
+        header = (ViewGroup) inflater.inflate(R.layout.profile_layout, postList, false);
+        birthday = (TextView) header.findViewById(R.id.prof_bday);
+        image = (NetworkImageView) header.findViewById(R.id.prof_image);
+        name = (TextView) header.findViewById(R.id.prof_name);
+
         mImageLoader = new ImageLoader(Volley.newRequestQueue(this), new ImageLoader.ImageCache() {
             private final LruCache<String, Bitmap> mCache = new LruCache<>(40);
 
@@ -104,7 +111,7 @@ public class ProfileActivity extends ActionBarActivity {
         public void onScroll(AbsListView view, int firstVisibleItem,
                              int visibleItemCount, int totalItemCount) {
             System.err.println("id" + firstVisibleItem + "itams" + visibleItemCount + "totalItemCount" + totalItemCount);
-            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount != 0) {
+            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount >1) {
                 if (loadingNow) {
                     loadingNow = false;
                     loadPostList();
