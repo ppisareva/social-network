@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -15,7 +17,6 @@ import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,8 +31,6 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.net.URL;
 import java.util.ArrayList;
 
 @EActivity(R.layout.profile_activity)
@@ -41,10 +40,13 @@ public class ProfileActivity extends ActionBarActivity {
     SNApp snApp;
     @ViewById(R.id.posts_list)
     public ListView postList;
+    @ViewById(R.id.refresh_layout)
+    public SwipeRefreshLayout refreshLayout;
     public TextView birthday;
     public NetworkImageView image;
     public TextView name;
     ViewGroup header;
+
 
     private String profileURL;
     private String connectionFailed;
@@ -54,6 +56,7 @@ public class ProfileActivity extends ActionBarActivity {
     private String idUser;
     private String idPost;
     private PostAdapter adapter;
+    private Handler handler = new Handler();
 
     private static final int NORMAL_LIST_SIZE = 9;
     private int totalPost = 10;
@@ -61,10 +64,9 @@ public class ProfileActivity extends ActionBarActivity {
 
     @AfterViews
     protected void init(){
-
+        postList.addHeaderView(header, null, false);
         postList.setAdapter(adapter);
         postList.setOnScrollListener(myScrollListener);
-        postList.addHeaderView(header, null, false);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         idUser = sharedPreferencesUserId.getString(Utils.USER_ID, "");
@@ -74,6 +76,21 @@ public class ProfileActivity extends ActionBarActivity {
             loadProfile();
         }
         loadPost();
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.clear();
+                        loadProfile();
+                        loadPost();
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
     }
 
     @Override
