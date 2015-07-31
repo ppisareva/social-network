@@ -64,10 +64,9 @@ public class ProfileActivity extends ActionBarActivity {
 
     @AfterViews
     protected void init(){
-
+        postList.addHeaderView(header, null, false);
         postList.setAdapter(adapter);
         postList.setOnScrollListener(myScrollListener);
-        postList.addHeaderView(header, null, false);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         idUser = sharedPreferencesUserId.getString(Utils.USER_ID, "");
@@ -128,13 +127,6 @@ public class ProfileActivity extends ActionBarActivity {
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem,
                              int visibleItemCount, int totalItemCount) {
-            boolean enable = false;
-            if(postList != null && postList.getChildCount() > 0){
-                boolean firstItemVisible = postList.getFirstVisiblePosition() == 0;
-                boolean topOfFirstItemVisible = postList.getChildAt(0).getTop() == 0;
-                enable = firstItemVisible && topOfFirstItemVisible;
-            }
-            refreshLayout.setEnabled(enable);
             System.err.println("id" + firstVisibleItem + "itams" + visibleItemCount + "totalItemCount" + totalItemCount);
             if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount >1) {
                 if (loadingNow) {
