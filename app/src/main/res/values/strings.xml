@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">SocialNetwork</string>
     <string name="action_settings">Settings</string>
+
     <string name="email">enter your mail</string>
     <string name="password">enter your password</string>
     <string name="password_conformation">confirm your password</string>
@@ -33,5 +34,14 @@
     <string name="connection_faild">no connection to the internet</string>
     <string name="wait">Please wait...</string>
     <string name="wrong_login_password">Wrong login or password</string>
+    <string name="title_activity_post_deteils">PostDeteilsActivity</string>
+    <string name="add_comment">send</string>
+    <string name="tag_holder">TEG FOR HOLDER</string>
+    <string name="tag_post">TEG FOR POST</string>
+    <string name="title_activity_comment_details">CommentDetailsActivity</string>
+    <string name="edit">edit</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="delete">delete comment</string>
 
 </resources>

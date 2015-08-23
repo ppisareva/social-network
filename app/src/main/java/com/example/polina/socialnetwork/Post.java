@@ -21,7 +21,14 @@ public class Post implements Serializable {
     String longitude;
     String image;
     String profileImage;
+    int like_count;
+    Comment last_comment;
+    int comments_count;
 
+
+    public int getComments_count() {
+        return comments_count;
+    }
 
     public void setOwnLike(boolean ownLike) {
         this.ownLike = ownLike;
@@ -65,8 +72,16 @@ public class Post implements Serializable {
         return profileImage;
     }
 
+    public int getLike_count() {
+        return like_count;
+    }
 
-    public Post(String idPost, Double createdAt, boolean ownLike, String name, String idUser, String message, String latitude, String longitude, String image, String profileImage) {
+    public Comment getLast_comment() {
+        return last_comment;
+    }
+
+    public Post(String idPost, Double createdAt, boolean ownLike, String name, String idUser, String message,
+                String latitude, String longitude, String image, String profileImage, int like_count, Comment last_comment, int comments_count) {
         this.createdAt = createdAt;
         this.ownLike = ownLike;
         this.name = name;
@@ -77,6 +92,9 @@ public class Post implements Serializable {
         this.longitude = longitude;
         this.image = image;
         this.profileImage = profileImage;
+        this.like_count = like_count;
+        this.last_comment = last_comment;
+        this.comments_count = comments_count;
     }
 
     static Post parse(JSONObject o) throws JSONException {
@@ -96,6 +114,14 @@ public class Post implements Serializable {
             longitude = object.optString(Utils.LONGITUDE);
         }
         String image = o.optString(Utils.IMAGE, "");
-        return new Post(idPost, created_at, ownLike, name, idUser, message, latitude, longitude, image, profileImage);
+        int like_count = o.optInt(Utils.LIKES_COUNT);
+        Comment comment=null;
+        JSONObject ob =  o.optJSONObject(Utils.LAST_COMMENT);
+        System.out.println(ob);
+        if(ob!=null){
+           comment = Comment.parse(o.optJSONObject((Utils.LAST_COMMENT)));
+        }
+        int comments_count = o.optInt(Utils.COMMENTS_COUNT);
+        return new Post(idPost, created_at, ownLike, name, idUser, message, latitude, longitude, image, profileImage, like_count, comment,  comments_count);
     }
 }

@@ -6,13 +6,15 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/refresh_layout">
+    android:id="@+id/refresh_layout"
+   >
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/posts_list"
             android:dividerHeight="10dp"
-            android:divider="@null"/>
+            android:divider="@null"
+             />
 
     </android.support.v4.widget.SwipeRefreshLayout>

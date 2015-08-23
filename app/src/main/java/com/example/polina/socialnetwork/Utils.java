@@ -6,6 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.LruCache;
+
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -44,9 +53,43 @@ public class Utils {
     public static final String IMAGE = "image";
     public static final String USER_ID_PREFERENCES = "User ID";
     public static final String USER_ID = "_id";
+    public static final String COMMENT_ID = "_id";
     public static final String POSTS_JSON = "posts";
+    public static final String LIKE_JSON = "users";
+    public static final String LIKES_COUNT = "likes_count";
+    public static final String LAST_COMMENT = "last_comment";
+    public static final String POST = "post";
+    public static final String COMMENT = "comment";
+    public static final String COMMENTS = "comments";
+    public static final String COMMENTS_COUNT = "comments_count";
+    public static final String IDPOSTINTENG = "postId";
+    public static  final String IDCOMMENTINTEND = "commentId";
+    public static  final String POSITION = "position";
+
+
+
     private final static int WIDTH = 100;
     private final static int HEIGHT = 100;
+
+
+    public static ImageLoader getmImageLoader(Context context) {
+        ImageLoader mImageLoader = new ImageLoader(Volley.newRequestQueue(context), new ImageLoader.ImageCache() {
+            private final LruCache<String, Bitmap> mCache = new LruCache<>(40);
+
+            @Override
+            public Bitmap getBitmap(String url) {
+                return mCache.get(url);
+            }
+
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+                mCache.put(url, bitmap);
+            }
+        });
+        return mImageLoader;
+    }
+
+
 
 
 
@@ -82,6 +125,26 @@ public class Utils {
             return 0;
         }
 
+    }
+
+    public static String  parseDate(double timestemp){
+        Date date = new Date((long) timestemp * 1000);
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy  HH:mm");
+        return format.format(date);
+    }
+
+    public static ArrayList<User> loadLikes(JSONObject o) {
+        ArrayList usersLiked = new ArrayList<>();
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = o.getJSONArray(Utils.LIKE_JSON);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                usersLiked.add(User.parse(jsonArray.getJSONObject(i)));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return usersLiked;
     }
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {

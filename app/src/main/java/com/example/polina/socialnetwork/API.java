@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.content.Context;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -14,6 +15,17 @@ public interface API {
     public  JSONObject getProfile(Context context);
     public JSONObject newPost (Context context, String massage, JSONObject location,  String image, String account);
     public JSONObject getLoadPosts(Context context, String idUser, int size, String idPost);
+    public JSONObject sendComment(Context context, String idPost, String comment);
+    public JSONObject getPost(Context context, String idPost);
+    public JSONObject getLike(Context context, String idPost);
+    public JSONObject getComments(Context context, String idPost);
+    public JSONObject editComment(Context context, String idPost, String idComment, String comment) throws JSONException;
+    public JSONObject deleteComment(Context context, String idPost, String idComment);
+
+
+
+
+
 
 
 }

@@ -7,14 +7,17 @@ import android.webkit.CookieSyncManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -33,6 +36,12 @@ public class ServerAPI implements API {
     private String postLoadPost = "?limit=%d&before=%s";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
+    private static final String postGetComment = HOST + "/post/%s/comment";
+    private static final String getPost = HOST + "/post/%s";
+    private static final String getLike = HOST + "/post/%s/like";
+
+
+
 
 
     @Override
@@ -55,6 +64,28 @@ public class ServerAPI implements API {
             o.put(Utils.PROF_URL, imageUrl);
             o.put(Utils.MINI_PROF_URL, imageMiniUrl);
             return postRequest(context, o, userInfoPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
+    private JSONObject deleteRequest(Context context, String path) {
+        try {
+            DefaultHttpClient client = new DefaultHttpClient();
+            HttpDelete delete = new HttpDelete(path);
+            CookieSyncManager.createInstance(context);
+            CookieManager cookieManager = CookieManager.getInstance();
+            delete.addHeader("Cookie", cookieManager.getCookie(path));
+            HttpResponse resp = client.execute(delete);
+            if (resp.getStatusLine().getStatusCode() < 400) {
+                String s = EntityUtils.toString(resp.getEntity());
+                return new JSONObject(s);
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -92,6 +123,48 @@ public class ServerAPI implements API {
             return getRequest(context, postGetPath + idUser);
         }
         return getRequest(context, postGetPath + idUser + String.format(postLoadPost, size, idPost));
+    }
+
+    @Override
+    public JSONObject sendComment(Context context, String idPost, String comment) {
+        JSONObject o = new JSONObject();
+        try {
+            o.put(Utils.COMMENT, comment);
+            postRequest(context, o, String.format(postGetComment, idPost) );
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public JSONObject getPost(Context context, String idPost) {
+        return getRequest(context, String.format(getPost, idPost));
+    }
+
+    @Override
+    public JSONObject getLike(Context context, String idPost) {
+        return getRequest(context, String.format(getLike, idPost));
+    }
+
+    @Override
+    public JSONObject getComments(Context context, String idPost) {
+        return getRequest(context, String.format(postGetComment, idPost));
+    }
+
+
+
+    @Override
+    public JSONObject editComment(Context context, String idPost, String idComment, String comment) throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put(Utils.COMMENT, comment);
+        return putRequest(context, o, String.format(postGetComment, idPost) +"/" +idComment);
+    }
+
+    @Override
+    public JSONObject deleteComment(Context context, String idPost, String idComment) {
+        return deleteRequest(context,  String.format(postGetComment, idPost) + "/" + idComment);
     }
 
     private JSONObject logInSignUp(String email, String password, String path, Context context) {
@@ -146,6 +219,27 @@ public class ServerAPI implements API {
             return null;
         }
     }
+
+    private JSONObject putRequest(Context context, JSONObject o, String path) {
+        try {
+            DefaultHttpClient client = new DefaultHttpClient();
+            HttpPut post = new HttpPut(path);
+            CookieSyncManager.createInstance(context);
+            CookieManager cookieManager = CookieManager.getInstance();
+            post.addHeader("Cookie", cookieManager.getCookie(path));
+            String data = o.toString();
+            post.setEntity(new StringEntity(data, HTTP.UTF_8));
+            HttpResponse resp = client.execute(post);
+            if (resp.getStatusLine().getStatusCode() < 400) {
+                String s = EntityUtils.toString(resp.getEntity());
+                return new JSONObject(s);
+            } else return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     public JSONObject newPost(Context context, String massage, JSONObject location, String image, String account) {
         JSONObject o = new JSONObject();

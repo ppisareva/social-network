@@ -18,6 +18,7 @@ public class IntroActivity extends Activity {
         CookieSyncManager.createInstance(this);
         if(CookieManager.getInstance().hasCookies()){
             Intent intent = new Intent(this, ProfileActivity_.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
     }
@@ -25,12 +26,15 @@ public class IntroActivity extends Activity {
     public void onClick(View v){
         switch (v.getId()){
             case R.id.sign_up:
+
                intent = new Intent(this, SignUpActivity_.class);
                 break;
             case R.id.sing_in:
+
                 intent = new Intent(this, SignInActivity_.class);
                 break;
         }
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
