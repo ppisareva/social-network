@@ -4,6 +4,7 @@ import android.content.Context;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -45,17 +46,17 @@ public class ServerAPI implements API {
 
 
     @Override
-    public JSONObject logIn(String email, String password, Context context) {
-        return logInSignUp(email, password, logInPath, context);
+    public JSONObject logIn(String email, String password) {
+        return logInSignUp(email, password, logInPath);
     }
 
     @Override
-    public JSONObject signUp(String email, String password, Context context) {
-        return logInSignUp(email, password, sighUpPath, context);
+    public JSONObject signUp(String email, String password) {
+        return logInSignUp(email, password, sighUpPath);
     }
 
     @Override
-    public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl, Context context) {
+    public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl) {
         JSONObject o = new JSONObject();
         try {
             o.put(Utils.NAME, name);
@@ -63,7 +64,7 @@ public class ServerAPI implements API {
             o.put(Utils.SEX, sex);
             o.put(Utils.PROF_URL, imageUrl);
             o.put(Utils.MINI_PROF_URL, imageMiniUrl);
-            return postRequest(context, o, userInfoPath);
+            return postRequest(o, userInfoPath);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -72,11 +73,10 @@ public class ServerAPI implements API {
 
 
 
-    private JSONObject deleteRequest(Context context, String path) {
+    private JSONObject deleteRequest(String path) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpDelete delete = new HttpDelete(path);
-            CookieSyncManager.createInstance(context);
             CookieManager cookieManager = CookieManager.getInstance();
             delete.addHeader("Cookie", cookieManager.getCookie(path));
             HttpResponse resp = client.execute(delete);
@@ -92,11 +92,10 @@ public class ServerAPI implements API {
         }
     }
 
-    private JSONObject getRequest(Context context, String path) {
+    private JSONObject getRequest( String path) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpGet get = new HttpGet(path);
-            CookieSyncManager.createInstance(context);
             CookieManager cookieManager = CookieManager.getInstance();
             get.addHeader("Cookie", cookieManager.getCookie(path));
             HttpResponse resp = client.execute(get);
@@ -113,24 +112,24 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getProfile(Context context) {
-        return getRequest(context, userInfoPath);
+    public JSONObject getProfile() {
+        return getRequest(userInfoPath);
     }
 
     @Override
-    public JSONObject getLoadPosts(Context context, String idUser, int size,  String idPost) {
+    public JSONObject getLoadPosts( String idUser, int size,  String idPost) {
         if(idPost.isEmpty()){
-            return getRequest(context, postGetPath + idUser);
+            return getRequest( postGetPath + idUser);
         }
-        return getRequest(context, postGetPath + idUser + String.format(postLoadPost, size, idPost));
+        return getRequest( postGetPath + idUser + String.format(postLoadPost, size, idPost));
     }
 
     @Override
-    public JSONObject sendComment(Context context, String idPost, String comment) {
+    public JSONObject sendComment( String idPost, String comment) {
         JSONObject o = new JSONObject();
         try {
             o.put(Utils.COMMENT, comment);
-            postRequest(context, o, String.format(postGetComment, idPost) );
+            postRequest( o, String.format(postGetComment, idPost) );
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -139,35 +138,35 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getPost(Context context, String idPost) {
-        return getRequest(context, String.format(getPost, idPost));
+    public JSONObject getPost( String idPost) {
+        return getRequest( String.format(getPost, idPost));
     }
 
     @Override
-    public JSONObject getLike(Context context, String idPost) {
-        return getRequest(context, String.format(getLike, idPost));
+    public JSONObject getLike(String idPost) {
+        return getRequest(String.format(getLike, idPost));
     }
 
     @Override
-    public JSONObject getComments(Context context, String idPost) {
-        return getRequest(context, String.format(postGetComment, idPost));
+    public JSONObject getComments(String idPost) {
+        return getRequest( String.format(postGetComment, idPost));
     }
 
 
 
     @Override
-    public JSONObject editComment(Context context, String idPost, String idComment, String comment) throws JSONException {
+    public JSONObject editComment( String idPost, String idComment, String comment) throws JSONException {
         JSONObject o = new JSONObject();
         o.put(Utils.COMMENT, comment);
-        return putRequest(context, o, String.format(postGetComment, idPost) +"/" +idComment);
+        return putRequest( o, String.format(postGetComment, idPost) +"/" +idComment);
     }
 
     @Override
-    public JSONObject deleteComment(Context context, String idPost, String idComment) {
-        return deleteRequest(context,  String.format(postGetComment, idPost) + "/" + idComment);
+    public JSONObject deleteComment( String idPost, String idComment) {
+        return deleteRequest( String.format(postGetComment, idPost) + "/" + idComment);
     }
 
-    private JSONObject logInSignUp(String email, String password, String path, Context context) {
+    private JSONObject logInSignUp(String email, String password, String path) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(path);
@@ -178,7 +177,6 @@ public class ServerAPI implements API {
             HttpResponse resp = client.execute(post);
             if (resp.getStatusLine().getStatusCode() < 400) {
                 List<Cookie> cookies = client.getCookieStore().getCookies();
-                CookieSyncManager.createInstance(context);
                 CookieManager cookieManager = CookieManager.getInstance();
                 cookieManager.setAcceptCookie(true);
                 cookieManager.removeAllCookie();
@@ -200,11 +198,10 @@ public class ServerAPI implements API {
         }
     }
 
-    private JSONObject postRequest(Context context, JSONObject o, String path) {
+    private JSONObject postRequest( JSONObject o, String path) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(path);
-            CookieSyncManager.createInstance(context);
             CookieManager cookieManager = CookieManager.getInstance();
             post.addHeader("Cookie", cookieManager.getCookie(path));
             String data = o.toString();
@@ -220,11 +217,10 @@ public class ServerAPI implements API {
         }
     }
 
-    private JSONObject putRequest(Context context, JSONObject o, String path) {
+    private JSONObject putRequest(JSONObject o, String path) {
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpPut post = new HttpPut(path);
-            CookieSyncManager.createInstance(context);
             CookieManager cookieManager = CookieManager.getInstance();
             post.addHeader("Cookie", cookieManager.getCookie(path));
             String data = o.toString();
@@ -241,14 +237,14 @@ public class ServerAPI implements API {
     }
 
 
-    public JSONObject newPost(Context context, String massage, JSONObject location, String image, String account) {
+    public JSONObject newPost( String massage, JSONObject location, String image, String account) {
         JSONObject o = new JSONObject();
         try {
             o.put(Utils.POST_MASSAGE, massage);
             o.put(Utils.POST_LOCATION, location);
             o.put(Utils.POST_IMAGE, image);
             o.put(Utils.POST_ACCOUNT, account);
-            return postRequest(context, o, postPath);
+            return postRequest( o, postPath);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

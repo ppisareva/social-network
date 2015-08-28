@@ -29,12 +29,11 @@ public class IntroActivity extends Activity {
 
                intent = new Intent(this, SignUpActivity_.class);
                 break;
-            case R.id.sing_in:
+            case R.id.sign_in:
 
                 intent = new Intent(this, SignInActivity_.class);
                 break;
         }
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

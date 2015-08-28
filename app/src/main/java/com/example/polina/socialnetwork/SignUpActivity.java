@@ -34,7 +34,7 @@ public class SignUpActivity extends Activity {
 
     @Background
     void signUpData() {
-        JSONObject o = snApp.api.signUp(email, password, SignUpActivity.this);
+        JSONObject o = snApp.api.signUp(email, password);
         check(o);
     }
 
@@ -43,17 +43,18 @@ public class SignUpActivity extends Activity {
         sharedPreferencesUserId =  getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
             try {
                 SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
-                ed.putString(Utils.USER_ID, o.getString(Utils.USER_ID));
+                ed.putString(Utils.ID, o.getString(Utils.ID));
                 ed.commit();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         if (o == null) {
-            registrationFail.setText(R.string.registration_feild);
+            registrationFail.setText(R.string.registration_faild);
             registrationFail.setVisibility(View.VISIBLE);
             return;
         } else {
             Intent intent = new Intent(this, FormActivity_.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
     }

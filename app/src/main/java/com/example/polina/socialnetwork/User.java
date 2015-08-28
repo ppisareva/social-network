@@ -19,7 +19,7 @@ public class User {
 
     public static User parse(JSONObject o){
         try {
-            return new User(o.getString(Utils.IDUSER), o.getString(Utils.MINI_PROF_URL), o.getString(Utils.NAME));
+            return new User(o.getString(Utils.ID), o.getString(Utils.MINI_PROF_URL), o.getString(Utils.NAME));
         } catch (JSONException e) {
             e.printStackTrace();
             return null;

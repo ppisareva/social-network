@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
@@ -48,9 +47,17 @@ public class CommentsAdapter extends ArrayAdapter<Comment>{
 
         holder.image.setImageUrl(comment.getProfileImage(), mImageLoader);
         holder.comment.setText(comment.getComment());
-        holder.date.setText(Utils.parseDate(comment.getTimeStemp()));
+        holder.date.setText(Utils.parseDate(comment.getTimestamp()));
         holder.name.setText(comment.getName());
 
         return view;
+    }
+
+    public class ViewHolderComments {
+        NetworkImageView image;
+        TextView name;
+        TextView comment;
+        TextView date;
+        Comment comments;
     }
 }

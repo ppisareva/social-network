@@ -52,8 +52,8 @@
                 android:value="splitActionBarWhenNarrow" />
         </activity>
         <activity
-            android:name=".PostDeteilsActivity_"
-            android:label="@string/title_activity_post_deteils" >
+            android:name=".PostDetailsActivity_"
+            android:label="@string/title_activity_post_details" >
         </activity>
         <activity
             android:name=".CommentDetailsActivity_"

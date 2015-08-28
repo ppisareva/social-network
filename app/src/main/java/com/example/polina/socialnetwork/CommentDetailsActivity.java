@@ -1,27 +1,18 @@
 package com.example.polina.socialnetwork;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.android.volley.toolbox.NetworkImageView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 @EActivity(R.layout.activity_comment_details)
 public class CommentDetailsActivity extends ActionBarActivity {
@@ -34,7 +25,7 @@ public class CommentDetailsActivity extends ActionBarActivity {
 
     Intent intent;
     String postId;
-    String commentID;
+    String commentId;
     String comment;
 
 
@@ -49,13 +40,13 @@ public class CommentDetailsActivity extends ActionBarActivity {
         intent = getIntent();
         Bundle bundle= intent.getExtras();
         if(bundle!=null) {
-            postId = bundle.getString(Utils.IDPOSTINTENG);
-            commentID = bundle.getString(Utils.IDCOMMENTINTEND);
+            postId = bundle.getString(Utils.POST_ID);
+            commentId = bundle.getString(Utils.COMMENT_ID);
             comment = bundle.getString(Utils.COMMENT);
             edit.setText(comment);
 
-            System.err.println("id post" + postId);
-            System.err.println("id comm" + commentID);
+            System.err.println("id post_items" + postId);
+            System.err.println("id comm" + commentId);
         }
 
     }
@@ -63,7 +54,7 @@ public class CommentDetailsActivity extends ActionBarActivity {
 @Background
     public void editComment(String comment) {
         try {
-            snApp.api.editComment(this, postId, commentID, comment);
+            snApp.api.editComment( postId, commentId, comment);
 
 
             intent.putExtra(Utils.COMMENT, comment);

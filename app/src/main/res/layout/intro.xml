@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sign_in"
-        android:id="@+id/sing_in"
+        android:id="@+id/sign_in"
         android:onClick="onClick"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"

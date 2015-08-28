@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -41,7 +42,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
     RequestQueue queue;
 
     public PostAdapter(Context context, List<Post> objects, ImageLoader mImageLoader) {
-        super(context, R.layout.post_list, objects);
+        super(context, R.layout.post_items, objects);
         this.context = context;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.mImageLoader = mImageLoader;
@@ -55,7 +56,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         Post post = getItem(position);
         ViewHolderPost holder;
         if (view == null) {
-            view = layoutInflater.inflate(R.layout.post_list, parent, false);
+            view = layoutInflater.inflate(R.layout.post_items, parent, false);
             holder = new ViewHolderPost();
             holder.checkBoxLike = (CheckBox) view.findViewById(R.id.like_chack_box);
             holder.imagePost = (NetworkImageView) view.findViewById(R.id.attached_image);
@@ -65,16 +66,16 @@ public class PostAdapter extends ArrayAdapter<Post> {
             holder.postText = (TextView) view.findViewById(R.id.post_text);
             holder.userName = (TextView) view.findViewById(R.id.user_name);
             holder.likeCount = (TextView) view.findViewById(R.id.like_count);
-            holder.commentUserImage = (NetworkImageView)view.findViewById(R.id.comment_image);
-            holder.commentUserName = (TextView)view.findViewById(R.id.comment_name);
-            holder.commentTimestemp= (TextView)view.findViewById(R.id.comment_time);
-            holder.commentLayout= (LinearLayout)view.findViewById(R.id.layout_comment);
-            holder.lastComment = (TextView)view.findViewById(R.id.last_comment);
+            holder.commentUserImage = (NetworkImageView) view.findViewById(R.id.comment_image);
+            holder.commentUserName = (TextView) view.findViewById(R.id.comment_name);
+            holder.commentTimestemp = (TextView) view.findViewById(R.id.comment_time);
+            holder.commentLayout = (RelativeLayout) view.findViewById(R.id.layout_comment);
+            holder.lastComment = (TextView) view.findViewById(R.id.last_comment);
             holder.commentsCount = (TextView) view.findViewById(R.id.comment_count);
             holder.post = post;
-            view.setTag(R.string.tag_holder, holder);
+            view.setTag(holder);
         } else {
-            holder = (ViewHolderPost) view.getTag(R.string.tag_holder);
+            holder = (ViewHolderPost) view.getTag();
         }
         holder.imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
         holder.userName.setText(post.getName());
@@ -92,19 +93,19 @@ public class PostAdapter extends ArrayAdapter<Post> {
         holder.checkBoxLike.setTag(position);
 
         holder.commentLayout.setVisibility(View.GONE);
-        Comment comment = post.last_comment;
-        if(comment!=null) {
+        Comment comment = post.lastComment;
+        if (comment != null) {
             holder.commentLayout.setVisibility(View.VISIBLE);
             holder.commentUserName.setText(comment.getName());
             holder.commentUserImage.setImageUrl(comment.getProfileImage(), mImageLoader);
-           holder.commentTimestemp.setText(Utils.parseDate(comment.getTimeStemp()));
-          holder.lastComment.setText(comment.getComment());
+            holder.commentTimestemp.setText(Utils.parseDate(comment.getTimestamp()));
+            holder.lastComment.setText(comment.getComment());
         }
-        if(post.getLike_count()!=0) {
-            holder.likeCount.setText("" + post.getLike_count());
+        if (post.getLikeCount() != 0) {
+            holder.likeCount.setText("" + post.getLikeCount());
         }
-        if(post.getComments_count()!=0) {
-            holder.commentsCount.setText("" + post.getComments_count());
+        if (post.getCommentsCount() != 0) {
+            holder.commentsCount.setText("" + post.getCommentsCount());
         }
         holder.location.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(post.getLatitude()) && !TextUtils.isEmpty(post.getLongitude())) {
@@ -112,7 +113,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
             holder.location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
             holder.location.setOnClickListener(onClickListener);
         }
-        view.setTag(R.string.tag_post,post);
+
         return view;
     }
 
@@ -132,11 +133,11 @@ public class PostAdapter extends ArrayAdapter<Post> {
             Post post = getItem((Integer) buttonView.getTag());
             post.setOwnLike(isChecked);
             if (isChecked)
-                post.like_count += 1;
+                ++post.likeCount;
             else
-                post.like_count -= 1;
+                --post.likeCount;
             notifyDataSetChanged();
-            final String url = ServerAPI.HOST + "post/" + getItem((int) buttonView.getTag()).getIdPost() + "/like";
+            final String url = ServerAPI.HOST + "post_items/" + getItem((int) buttonView.getTag()).getPostId() + "/like";
             queue.add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -164,6 +165,25 @@ public class PostAdapter extends ArrayAdapter<Post> {
             System.err.println("VOLLY ERROR: " + error);
         }
     };
-}
+
+    public class ViewHolderPost {
+
+        NetworkImageView imageUser;
+        TextView userName;
+        TextView postDate;
+        TextView postText;
+        NetworkImageView imagePost;
+        CheckBox checkBoxLike;
+        ImageView location;
+        NetworkImageView commentUserImage;
+        TextView commentUserName;
+        TextView commentTimestemp;
+        RelativeLayout commentLayout;
+        TextView lastComment;
+        TextView likeCount;
+        Post post;
+        TextView commentsCount;
+
+    }}
 
 

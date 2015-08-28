@@ -1,28 +1,29 @@
 package com.example.polina.socialnetwork;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.Serializable;
 
 /**
  * Created by polina on 10.08.15.
  */
-public class Comment {
+public class Comment  implements Serializable{
     String name;
     String profileImage;
     String userID;
-    Double timeStemp;
-    String commentID;
+    Double timestamp;
+    String commentId;
     String comment;
 
 
 
-    public Comment(String userID, String profileImage, String name, Double timeStemp, String commentID, String comment) {
+    public Comment(String userID, String profileImage, String name, Double timestamp, String commentId, String comment) {
         this.userID = userID;
         this.profileImage = profileImage;
         this.name = name;
-        this.timeStemp = timeStemp;
-        this.commentID = commentID;
+        this.timestamp = timestamp;
+        this.commentId = commentId;
         this.comment = comment;
     }
 
@@ -34,30 +35,27 @@ public class Comment {
         return profileImage;
     }
 
-    public String getUserID() {
-        return userID;
+
+    public Double getTimestamp() {
+        return timestamp;
     }
 
-    public Double getTimeStemp() {
-        return timeStemp;
-    }
-
-    public String getCommentID() {
-        return commentID;
+    public String getCommentId() {
+        return commentId;
     }
 
     public String getComment() {
         return comment;
     }
 
-    public static Comment parse (JSONObject o) throws JSONException {
-        JSONObject object =o.getJSONObject(Utils.CREATED_BY);
-        String prifileImage = object.getString(Utils.MINI_PROF_URL);
-        String userID = object.getString(Utils.USER_ID);
-        String name = object.getString(Utils.NAME);
-        Double timeStemp = o.getDouble(Utils.TIMESTAMP);
-        String commentID = o.getString(Utils.COMMENT_ID);
-        String comment=o.getString(Utils.COMMENT);
-        return new Comment(userID, prifileImage, name, timeStemp, commentID, comment);
+    public static Comment parse (JSONObject o)  {
+        JSONObject object =o.optJSONObject(Utils.CREATED_BY);
+        String profileImage = object.optString(Utils.MINI_PROF_URL);
+        String userID = object.optString(Utils.ID);
+        String name = object.optString(Utils.NAME);
+        Double timestamp = o.optDouble(Utils.TIMESTAMP);
+        String commentID = o.optString(Utils.COMMENT_ID);
+        String comment=o.optString(Utils.COMMENT);
+        return new Comment(userID, profileImage, name, timestamp, commentID, comment);
     }
 }

@@ -36,7 +36,7 @@ public class SignInActivity extends Activity {
 
     @Background
     void logIn() {
-        JSONObject o = snApp.api.logIn(email, password, SignInActivity.this);
+        JSONObject o = snApp.api.logIn(email, password);
         checkData(o);
     }
 
@@ -45,7 +45,7 @@ public class SignInActivity extends Activity {
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         try {
             SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
-            ed.putString(Utils.USER_ID, o.getString(Utils.USER_ID));
+            ed.putString(Utils.ID, o.getString(Utils.ID));
             ed.commit();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -56,9 +56,11 @@ public class SignInActivity extends Activity {
         } else {
             if (!o.has(Utils.NAME)) {
                 intent = new Intent(SignInActivity.this, FormActivity_.class);
+
             } else {
                 intent = new Intent(SignInActivity.this, ProfileActivity_.class);
             }
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
     }

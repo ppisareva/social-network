@@ -10,7 +10,7 @@
     <string name="title_activity_intro">intro</string>
     <string name="title_activity_sign_in">Sign_in</string>
     <string name="title_activity_sign_up">Sign_up</string>
-    <string name="registration_feild">User already exist</string>
+    <string name="registration_faild">User already exist</string>
     <string name="password_wrong">Wrong password</string>
     <string name="title_activity_form_activity">Form_activity</string>
     <string name="form_name">name</string>
@@ -34,14 +34,10 @@
     <string name="connection_faild">no connection to the internet</string>
     <string name="wait">Please wait...</string>
     <string name="wrong_login_password">Wrong login or password</string>
-    <string name="title_activity_post_deteils">PostDeteilsActivity</string>
+    <string name="title_activity_post_details">PostDetailsActivity</string>
     <string name="add_comment">send</string>
-    <string name="tag_holder">TEG FOR HOLDER</string>
-    <string name="tag_post">TEG FOR POST</string>
     <string name="title_activity_comment_details">CommentDetailsActivity</string>
-    <string name="edit">edit</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="edit">edit comment</string>
     <string name="delete">delete comment</string>
 
 </resources>
