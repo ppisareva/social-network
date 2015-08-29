@@ -221,7 +221,6 @@ public class PostDetailsActivity extends ActionBarActivity {
         if(post.isOwnLike()){
             checkBoxLike.setChecked(true);
         }
-
             if (post.getLatitude()!=null) {
                 location.setVisibility(View.VISIBLE);
                 location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
@@ -244,15 +243,12 @@ public class PostDetailsActivity extends ActionBarActivity {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     compoundButton.setChecked(isChecked);
-
-                    likeCount.setText("" + (isChecked ? ++countLikes : --countLikes));
-
-                    final String url = ServerAPI.HOST + "post_items/" + post + "/like";
+                    likeCount.setText("" + (isChecked ? ++countLikes : --countLikes==0 ? "" : countLikes));
+                    final String url = ServerAPI.HOST + "post/" + post.getPostId() + "/like";
                     Volley.newRequestQueue(PostDetailsActivity.this).add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
                         @Override
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> headers = new HashMap<>();
-                            CookieSyncManager.createInstance(PostDetailsActivity.this);
                             CookieManager cookieManager = CookieManager.getInstance();
                             headers.put("Cookie", cookieManager.getCookie(url));
                             return headers;

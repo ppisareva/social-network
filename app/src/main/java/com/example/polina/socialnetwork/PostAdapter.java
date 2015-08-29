@@ -89,7 +89,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
         holder.checkBoxLike.setOnCheckedChangeListener(null);
         holder.checkBoxLike.setChecked(post.isOwnLike());
-        holder.checkBoxLike.setOnCheckedChangeListener(myCheckChangList);
+        holder.checkBoxLike.setOnCheckedChangeListener(myCheckChangeList);
         holder.checkBoxLike.setTag(position);
 
         holder.commentLayout.setVisibility(View.GONE);
@@ -101,12 +101,8 @@ public class PostAdapter extends ArrayAdapter<Post> {
             holder.commentTimestemp.setText(Utils.parseDate(comment.getTimestamp()));
             holder.lastComment.setText(comment.getComment());
         }
-        if (post.getLikeCount() != 0) {
-            holder.likeCount.setText("" + post.getLikeCount());
-        }
-        if (post.getCommentsCount() != 0) {
-            holder.commentsCount.setText("" + post.getCommentsCount());
-        }
+        holder.likeCount.setText("" + (post.getLikeCount() != 0 ? post.getLikeCount() : ""));
+        holder.commentsCount.setText(post.getCommentsCount() != 0 ? "" + post.getCommentsCount() : "");
         holder.location.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(post.getLatitude()) && !TextUtils.isEmpty(post.getLongitude())) {
             holder.location.setVisibility(View.VISIBLE);
@@ -127,7 +123,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         }
     };
 
-    CompoundButton.OnCheckedChangeListener myCheckChangList = new CompoundButton.OnCheckedChangeListener() {
+    CompoundButton.OnCheckedChangeListener myCheckChangeList = new CompoundButton.OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
             Post post = getItem((Integer) buttonView.getTag());
@@ -137,7 +133,8 @@ public class PostAdapter extends ArrayAdapter<Post> {
             else
                 --post.likeCount;
             notifyDataSetChanged();
-            final String url = ServerAPI.HOST + "post_items/" + getItem((int) buttonView.getTag()).getPostId() + "/like";
+            final String url = ServerAPI.HOST + "post_items/" + post.getPostId() + "/like";
+            System.err.println(url);
             queue.add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -184,6 +181,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         Post post;
         TextView commentsCount;
 
-    }}
+    }
+}
 
 
