@@ -2,20 +2,19 @@ package com.example.polina.socialnetwork;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Network;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -29,12 +28,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
-import org.androidannotations.annotations.App;
-import org.androidannotations.annotations.Background;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,23 +40,24 @@ public class PostAdapter extends ArrayAdapter<Post> {
     Context context;
     ImageLoader mImageLoader;
     RequestQueue queue;
-    ViewHolder holder;
 
     public PostAdapter(Context context, List<Post> objects, ImageLoader mImageLoader) {
-        super(context, R.layout.post_list, objects);
+        super(context, R.layout.post_items, objects);
         this.context = context;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.mImageLoader = mImageLoader;
         queue = Volley.newRequestQueue(context);
+
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
-        final Post post = getItem(position);
+        Post post = getItem(position);
+        ViewHolderPost holder;
         if (view == null) {
-            view = layoutInflater.inflate(R.layout.post_list, parent, false);
-            holder = new ViewHolder();
+            view = layoutInflater.inflate(R.layout.post_items, parent, false);
+            holder = new ViewHolderPost();
             holder.checkBoxLike = (CheckBox) view.findViewById(R.id.like_chack_box);
             holder.imagePost = (NetworkImageView) view.findViewById(R.id.attached_image);
             holder.imageUser = (NetworkImageView) view.findViewById(R.id.user_image);
@@ -71,15 +65,21 @@ public class PostAdapter extends ArrayAdapter<Post> {
             holder.postDate = (TextView) view.findViewById(R.id.time_stamp);
             holder.postText = (TextView) view.findViewById(R.id.post_text);
             holder.userName = (TextView) view.findViewById(R.id.user_name);
+            holder.likeCount = (TextView) view.findViewById(R.id.like_count);
+            holder.commentUserImage = (NetworkImageView) view.findViewById(R.id.comment_image);
+            holder.commentUserName = (TextView) view.findViewById(R.id.comment_name);
+            holder.commentTimestemp = (TextView) view.findViewById(R.id.comment_time);
+            holder.commentLayout = (RelativeLayout) view.findViewById(R.id.layout_comment);
+            holder.lastComment = (TextView) view.findViewById(R.id.last_comment);
+            holder.commentsCount = (TextView) view.findViewById(R.id.comment_count);
+            holder.post = post;
             view.setTag(holder);
         } else {
-            holder = (ViewHolder) view.getTag();
+            holder = (ViewHolderPost) view.getTag();
         }
         holder.imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
         holder.userName.setText(post.getName());
-        Date date = new Date((long) post.getCreatedAt() * 1000);
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy  HH:mm");
-        holder.postDate.setText(format.format(date));
+        holder.postDate.setText(Utils.parseDate(post.getCreatedAt()));
         holder.postText.setText(post.getMessage());
         holder.imagePost.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(post.getImage())) {
@@ -89,15 +89,27 @@ public class PostAdapter extends ArrayAdapter<Post> {
 
         holder.checkBoxLike.setOnCheckedChangeListener(null);
         holder.checkBoxLike.setChecked(post.isOwnLike());
-        holder.checkBoxLike.setOnCheckedChangeListener(myCheckChangList);
+        holder.checkBoxLike.setOnCheckedChangeListener(myCheckChangeList);
         holder.checkBoxLike.setTag(position);
 
+        holder.commentLayout.setVisibility(View.GONE);
+        Comment comment = post.lastComment;
+        if (comment != null) {
+            holder.commentLayout.setVisibility(View.VISIBLE);
+            holder.commentUserName.setText(comment.getName());
+            holder.commentUserImage.setImageUrl(comment.getProfileImage(), mImageLoader);
+            holder.commentTimestemp.setText(Utils.parseDate(comment.getTimestamp()));
+            holder.lastComment.setText(comment.getComment());
+        }
+        holder.likeCount.setText("" + (post.getLikeCount() != 0 ? post.getLikeCount() : ""));
+        holder.commentsCount.setText(post.getCommentsCount() != 0 ? "" + post.getCommentsCount() : "");
         holder.location.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(post.getLatitude()) && !TextUtils.isEmpty(post.getLongitude())) {
             holder.location.setVisibility(View.VISIBLE);
             holder.location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
             holder.location.setOnClickListener(onClickListener);
         }
+
         return view;
     }
 
@@ -111,11 +123,18 @@ public class PostAdapter extends ArrayAdapter<Post> {
         }
     };
 
-    CompoundButton.OnCheckedChangeListener myCheckChangList = new CompoundButton.OnCheckedChangeListener() {
+    CompoundButton.OnCheckedChangeListener myCheckChangeList = new CompoundButton.OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
-            getItem((Integer) buttonView.getTag()).setOwnLike(isChecked);
-            final String url = ServerAPI.HOST + "post/" + getItem((int) buttonView.getTag()).getIdPost() + "/like";
+            Post post = getItem((Integer) buttonView.getTag());
+            post.setOwnLike(isChecked);
+            if (isChecked)
+                ++post.likeCount;
+            else
+                --post.likeCount;
+            notifyDataSetChanged();
+            final String url = ServerAPI.HOST + "post_items/" + post.getPostId() + "/like";
+            System.err.println(url);
             queue.add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -143,6 +162,26 @@ public class PostAdapter extends ArrayAdapter<Post> {
             System.err.println("VOLLY ERROR: " + error);
         }
     };
+
+    private class ViewHolderPost {
+
+        NetworkImageView imageUser;
+        TextView userName;
+        TextView postDate;
+        TextView postText;
+        NetworkImageView imagePost;
+        CheckBox checkBoxLike;
+        ImageView location;
+        NetworkImageView commentUserImage;
+        TextView commentUserName;
+        TextView commentTimestemp;
+        RelativeLayout commentLayout;
+        TextView lastComment;
+        TextView likeCount;
+        Post post;
+        TextView commentsCount;
+
+    }
 }
 
 

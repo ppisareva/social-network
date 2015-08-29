@@ -64,7 +64,7 @@ public class FormActivity extends Activity {
 
     @Background
     public void loadProfInfo() {
-        JSONObject o = snApp.api.getProfile(FormActivity.this);
+        JSONObject o = snApp.api.getProfile();
         addProfileInfo(o);
     }
 
@@ -177,7 +177,7 @@ public class FormActivity extends Activity {
                 imageURI = S3Helper.uploadImage(path);
                 miniImageURI = S3Helper.uploadImage(inputStream);
             }
-            JSONObject o = snApp.api.saveProfile(name.getText().toString(), birthday.getText().toString(), sex.getText().toString(), imageURI, miniImageURI, FormActivity.this);
+            JSONObject o = snApp.api.saveProfile(name.getText().toString(), birthday.getText().toString(), sex.getText().toString(), imageURI, miniImageURI);
             System.err.println(o);
             if (o != null) {
                 Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);

@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,8 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @EActivity(R.layout.profile_activity)
@@ -62,14 +65,27 @@ public class ProfileActivity extends ActionBarActivity {
     private int totalPost = 10;
     private boolean loadingNow = true;
 
+
+
     @AfterViews
     protected void init(){
-        postList.addHeaderView(header, null, false);
         postList.setAdapter(adapter);
+        postList.addHeaderView(header, null, false);
         postList.setOnScrollListener(myScrollListener);
+        postList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Post post = (Post)adapterView.getItemAtPosition(i);
+                Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity_.class);
+                intent.putExtra(Utils.POST, post);
+                startActivity(intent);
+            }
+        });
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
-        idUser = sharedPreferencesUserId.getString(Utils.USER_ID, "");
+        idUser = sharedPreferencesUserId.getString(Utils.ID, "");
+        System.err.println("user id " + idUser);
         if (sharedPreferences.contains(Utils.NAME)) {
             loadProfileFromMemory(sharedPreferences);
         } else {
@@ -141,7 +157,7 @@ public class ProfileActivity extends ActionBarActivity {
     public void loadPostList() {
         System.out.println("------------------------------" + idUser + "    " + idPost);
         if (!idPost.isEmpty()) {
-            JSONObject objectPosts = snApp.api.getLoadPosts(ProfileActivity.this, idUser, totalPost, idPost);
+            JSONObject objectPosts = snApp.api.getLoadPosts(idUser, totalPost, idPost);
             System.out.println(objectPosts + "-------------------------------------------------");
             loadPostUIThread(objectPosts);
             return;
@@ -150,7 +166,8 @@ public class ProfileActivity extends ActionBarActivity {
 
     @Background
     public void loadPost() {
-        JSONObject objectPosts = snApp.api.getLoadPosts(ProfileActivity.this, idUser, totalPost, "");
+        JSONObject objectPosts = snApp.api.getLoadPosts(idUser, totalPost, "");
+        System.out.println("posrs = "+objectPosts);
         loadPostUIThread(objectPosts);
     }
 
@@ -165,17 +182,27 @@ public class ProfileActivity extends ActionBarActivity {
                     jsonPost = jsonArray.getJSONObject(i);
                     posts.add(Post.parse(jsonPost));
                 }
-                idPost = (posts.size() > NORMAL_LIST_SIZE ? posts.get(NORMAL_LIST_SIZE).getIdPost() : "");
-                updateAdapter(posts);
+                idPost = (posts.size() > NORMAL_LIST_SIZE ? posts.get(NORMAL_LIST_SIZE).getPostId() : "");
+               updateAdapter(posts);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+
+
+    @UiThread
+    public void updateAdapter(ArrayList<Post> posts) {
+        adapter.addAll(posts);
+        adapter.notifyDataSetChanged();
+        loadingNow = true;
+    }
+
     @Background
     public void loadProfile() {
-        JSONObject o = snApp.api.getProfile(ProfileActivity.this);
+        JSONObject o = snApp.api.getProfile();
+        System.out.println(o);
         if (o != null) {
             addProfileInfo(o);
         } else {
@@ -200,13 +227,6 @@ public class ProfileActivity extends ActionBarActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @UiThread
-    public void updateAdapter(ArrayList<Post> posts) {
-        adapter.addAll(posts);
-        adapter.notifyDataSetChanged();
-        loadingNow = true;
     }
 
     private void loadProfileFromMemory(SharedPreferences sharedPreferences) {

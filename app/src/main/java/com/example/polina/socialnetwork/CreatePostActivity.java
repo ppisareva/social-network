@@ -183,7 +183,7 @@ public class CreatePostActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
         }
-        JSONObject o = snApp.api.newPost(this, massage, jsonLocation, image, account);
+        JSONObject o = snApp.api.newPost(massage, jsonLocation, image, account);
                if (o != null) {
             Intent intent = new Intent(this, ProfileActivity_.class);
             startActivity(intent);

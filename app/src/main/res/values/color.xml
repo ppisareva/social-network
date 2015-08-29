@@ -4,4 +4,5 @@
     <color name="button_sign_in">#fcc1c6ff</color>
     <color name="button_sign_in_background">#fc3af2ff</color>
     <color name="white">#FFFFFF</color>
+    <color name="gray">#AAA</color>
 </resources>
