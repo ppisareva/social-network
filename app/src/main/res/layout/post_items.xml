@@ -102,7 +102,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/comment_butten"
             android:src="@drawable/ic_mode_comment_black_48dp"
-            android:clickable="true"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp" />

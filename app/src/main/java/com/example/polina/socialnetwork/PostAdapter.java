@@ -163,7 +163,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         }
     };
 
-    public class ViewHolderPost {
+    private class ViewHolderPost {
 
         NetworkImageView imageUser;
         TextView userName;

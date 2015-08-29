@@ -98,8 +98,6 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/comment_butten_details"
                 android:src="@drawable/ic_mode_comment_black_48dp"
-                android:clickable="true"
-                android:onClick="onAddComment"
                 android:layout_marginRight="5dp" />
 
             <TextView
