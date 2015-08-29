@@ -60,10 +60,12 @@ public class ProfileActivity extends ActionBarActivity {
     private String idPost;
     private PostAdapter adapter;
     private Handler handler = new Handler();
+    ArrayList<Post> posts = new ArrayList<>();
 
     private static final int NORMAL_LIST_SIZE = 9;
     private int totalPost = 10;
     private boolean loadingNow = true;
+    int INTENT_DELETE = 0;
 
 
 
@@ -76,12 +78,15 @@ public class ProfileActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Post post = (Post)adapterView.getItemAtPosition(i);
+                Post post = (Post) adapterView.getItemAtPosition(i);
                 Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity_.class);
                 intent.putExtra(Utils.POST, post);
-                startActivity(intent);
+                intent.putExtra(Utils.POSITION, i);
+                startActivityForResult(intent, INTENT_DELETE);
             }
         });
+
+
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
         idUser = sharedPreferencesUserId.getString(Utils.ID, "");
@@ -107,6 +112,22 @@ public class ProfileActivity extends ActionBarActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == INTENT_DELETE && RESULT_OK == resultCode) {
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                int position = bundle.getInt(Utils.POSITION);
+                posts.remove(--position);
+                adapter.clear();
+                adapter.addAll(posts);
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -176,7 +197,7 @@ public class ProfileActivity extends ActionBarActivity {
         if (o != null) {
             try {
                 JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
-                ArrayList<Post> posts = new ArrayList<>();
+                posts = new ArrayList<>();
                 JSONObject jsonPost;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     jsonPost = jsonArray.getJSONObject(i);

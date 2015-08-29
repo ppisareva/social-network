@@ -40,6 +40,7 @@ public class ServerAPI implements API {
     private static final String postGetComment = HOST + "/post/%s/comment";
     private static final String getPost = HOST + "/post/%s";
     private static final String getLike = HOST + "/post/%s/like";
+    private static final String deleteEditPost = HOST + "/user/me/post/%s";
 
 
 
@@ -140,6 +141,11 @@ public class ServerAPI implements API {
     @Override
     public JSONObject getPost( String idPost) {
         return getRequest( String.format(getPost, idPost));
+    }
+
+    @Override
+    public JSONObject deletePost(String postId) {
+        return deleteRequest(String.format(deleteEditPost, postId));
     }
 
     @Override
