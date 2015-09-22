@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -218,31 +219,6 @@ public class PostDetailsActivity extends ActionBarActivity {
         adapter.notifyDataSetChanged();
     }
 
-//    @Background
-//    public void loadLike() {
-//        JSONObject o = snApp.api.getLike(PostDetailsActivity.this, post_items.getPostId());
-//        System.out.println(o + "-----");
-//        if (o != null) {
-//            viewLikes(o);
-//        }
-//    }
-//
-//    @UiThread
-//    public void viewLikes(JSONObject o) {
-//        usersLiked = Utils.loadUsersLiked(o);
-//        if (!usersLiked.isEmpty()) {
-//            countLikes = usersLiked.size();
-//            likeCount.setText("" + countLikes);
-//        }
-//        for (User user : usersLiked) {
-//            if (user.userId.equals(idUser)) {
-//                checkBoxLike.setChecked(true);
-//                break;
-//            }
-//        }
-//    }
-
-
     public void loadPost() {
             postDate.setText(Utils.parseDate(post.getCreatedAt()));
             userName.setText(post.getName());
@@ -253,7 +229,7 @@ public class PostDetailsActivity extends ActionBarActivity {
         if(post.isOwnLike()){
             checkBoxLike.setChecked(true);
         }
-            if (post.getLatitude()!=null) {
+            if (!TextUtils.isEmpty(post.getLatitude())) {
                 location.setVisibility(View.VISIBLE);
                 location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
                 location.setOnClickListener(new View.OnClickListener() {

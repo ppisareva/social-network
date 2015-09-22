@@ -37,10 +37,10 @@ public class ServerAPI implements API {
     private String postLoadPost = "?limit=%d&before=%s";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
-    private static final String postGetComment = HOST + "/post/%s/comment";
-    private static final String getPost = HOST + "/post/%s";
-    private static final String getLike = HOST + "/post/%s/like";
-    private static final String deleteEditPost = HOST + "/user/me/post/%s";
+    private String postGetComment = HOST + "/post/%s/comment";
+    private String getPost = HOST + "/post/%s";
+    private String getLike = HOST + "/post/%s/like";
+    private String deleteEditPost = HOST + "/user/me/post/%s";
 
 
 
@@ -94,6 +94,7 @@ public class ServerAPI implements API {
     }
 
     private JSONObject getRequest( String path) {
+        System.err.println("REQUEST PATH: " + path);
         try {
             DefaultHttpClient client = new DefaultHttpClient();
             HttpGet get = new HttpGet(path);

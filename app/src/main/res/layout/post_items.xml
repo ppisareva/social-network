@@ -89,7 +89,7 @@
             android:layout_marginTop="5dp" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/like_count"
             android:layout_weight="1"
@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/image_lication"
             android:src="@drawable/ic_room_black_48dp"
-            android:visibility="gone"
+            android:visibility="visible"
             android:clickable="true"
             android:layout_marginTop="5dp" />
     </LinearLayout>
