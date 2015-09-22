@@ -26,7 +26,7 @@ public class SignInActivity extends Activity {
 
     private String email;
     private String password;
-    SharedPreferences sharedPreferencesUserId;
+    SharedPreferences sharedPreferences;
 
     public void signIn(View v) {
         email = em.getText().toString();
@@ -42,9 +42,9 @@ public class SignInActivity extends Activity {
 
     @org.androidannotations.annotations.UiThread
     void checkData(JSONObject o) {
-        sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         try {
-            SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
+            SharedPreferences.Editor ed = sharedPreferences.edit();
             ed.putString(Utils.ID, o.getString(Utils.ID));
             ed.commit();
         } catch (JSONException e) {

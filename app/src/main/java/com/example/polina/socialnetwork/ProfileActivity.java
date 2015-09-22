@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -15,20 +14,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.android.volley.toolbox.ImageLoader;
+
 import com.android.volley.toolbox.NetworkImageView;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-import java.util.ArrayList;
 
 @EActivity(R.layout.profile_activity)
 public class ProfileActivity extends ActionBarActivity {
@@ -44,9 +41,8 @@ public class ProfileActivity extends ActionBarActivity {
     public TextView name;
 
     private SharedPreferences sharedPreferences;
-    private SharedPreferences sharedPreferencesUserId;
       private ActionBarDrawerToggle toggle;
-    FragmentProfile fragmentProfile;
+    ProfileFragment profileFragment;
     FragmentTransaction ft;
     private final int LOG_OUT = 1;
     private final int PROFILE = 0;
@@ -72,14 +68,13 @@ public class ProfileActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i){
                     case PROFILE:
-                        getFragmentManager().beginTransaction().replace(R.id.fragment_profile, fragmentProfile).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
                     case LOG_OUT:
                         CookieSyncManager.createInstance(ProfileActivity.this);
                         CookieManager cookieManager = CookieManager.getInstance();
                         cookieManager.removeAllCookie();
                         sharedPreferences.edit().clear().commit();
-                        sharedPreferencesUserId.edit().clear().commit();
                        Intent intent = new Intent(ProfileActivity.this, IntroActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);;
@@ -98,8 +93,6 @@ public class ProfileActivity extends ActionBarActivity {
         bar.setDisplayShowHomeEnabled(true);
 
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
-        sharedPreferencesUserId = getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
-
     }
 
 
@@ -108,17 +101,14 @@ public class ProfileActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
 
-       fragmentProfile = new FragmentProfile();
-        ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.fragment_profile, fragmentProfile);
-        ft.commit();
+       profileFragment = new ProfileFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_profile, profileFragment).commit();
     }
 
 
     public void onPost(View v) {
         Intent intent = new Intent(this, CreatePostActivity_.class);
         startActivity(intent);
-
     }
 
     @Override
@@ -131,7 +121,6 @@ public class ProfileActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.edit_profile) {
-            sharedPreferences.edit().clear().commit();
             Intent intent = new Intent(this, FormActivity_.class);
             startActivity(intent);
         }

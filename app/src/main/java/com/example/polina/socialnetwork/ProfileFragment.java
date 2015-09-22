@@ -1,15 +1,11 @@
 package com.example.polina.socialnetwork;
-
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.Volley;
-
-import org.androidannotations.annotations.EFragment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,11 +23,10 @@ import java.util.ArrayList;
 /**
  * Created by polina on 15.09.15.
  */
-@EFragment
-public class FragmentProfile extends Fragment{
+
+public class ProfileFragment extends Fragment{
 
     SNApp snApp;
-
     public ListView postList;
     public SwipeRefreshLayout refreshLayout;
     public TextView birthday;
@@ -49,8 +39,6 @@ public class FragmentProfile extends Fragment{
     private String profileURL;
     private String connectionFailed;
     private SharedPreferences sharedPreferences;
-    private SharedPreferences sharedPreferencesUserId;
-    private ImageLoader mImageLoader;
     private String idUser;
     private String idPost;
     private PostAdapter adapter;
@@ -75,25 +63,9 @@ public class FragmentProfile extends Fragment{
 
         snApp= (SNApp) getActivity().getApplication();
 
-
-
-        mImageLoader = new ImageLoader(Volley.newRequestQueue(thisContext), new ImageLoader.ImageCache() {
-            private final LruCache<String, Bitmap> mCache = new LruCache<>(40);
-
-            @Override
-            public Bitmap getBitmap(String url) {
-                return mCache.get(url);
-            }
-
-            @Override
-            public void putBitmap(String url, Bitmap bitmap) {
-                mCache.put(url, bitmap);
-            }
-        });
-        adapter = new PostAdapter(thisContext, posts, mImageLoader);
+        adapter = new PostAdapter(thisContext, posts,snApp.mImageLoader);
         connectionFailed = getResources().getString(R.string.connection_faild);
-
-         postList =(ListView) v.findViewById(R.id.posts_list);
+        postList =(ListView) v.findViewById(R.id.posts_list);
         postList.setAdapter(adapter);
         postList.addHeaderView(header, null, false);
         postList.setOnScrollListener(myScrollListener);
@@ -112,8 +84,7 @@ public class FragmentProfile extends Fragment{
 
 
         sharedPreferences = this.getActivity().getSharedPreferences(Utils.PROFILE_PREFERENCES, thisContext.MODE_PRIVATE);
-        sharedPreferencesUserId = this.getActivity().getSharedPreferences(Utils.USER_ID_PREFERENCES, thisContext.MODE_PRIVATE);
-        idUser = sharedPreferencesUserId.getString(Utils.ID, "");
+        idUser = sharedPreferences.getString(Utils.ID, "");
         System.err.println("user id " + idUser);
         if (sharedPreferences.contains(Utils.NAME)) {
             loadProfileFromMemory(sharedPreferences);
@@ -254,7 +225,7 @@ public class FragmentProfile extends Fragment{
                    birthday.setText(years);
                    editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
                    System.err.println(o.getString(Utils.PROF_URL));
-                   image.setImageUrl(o.getString(Utils.PROF_URL), mImageLoader);
+                   image.setImageUrl(o.getString(Utils.PROF_URL), snApp.mImageLoader);
                    editor.putString(Utils.PROF_URL, o.getString(Utils.PROF_URL));
                    editor.commit();
                } catch (Exception e) {
@@ -272,7 +243,7 @@ public class FragmentProfile extends Fragment{
         String years = getResources().getQuantityString(R.plurals.years, y, y);
         birthday.setText(years);
         profileURL = sharedPreferences.getString(Utils.PROF_URL, "");
-        image.setImageUrl(profileURL, mImageLoader);
+        image.setImageUrl(profileURL, snApp.mImageLoader);
         System.out.println(profileURL + " --------------------------");
     }
 
