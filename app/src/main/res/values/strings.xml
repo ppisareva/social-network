@@ -39,5 +39,19 @@
     <string name="title_activity_comment_details">CommentDetailsActivity</string>
     <string name="edit">edit comment</string>
     <string name="delete">delete comment</string>
+    <string name="title_activity_side_menu">SideMenu</string>
 
+    <string name="hello_world">Hello world!</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    
+    <string-array name="left_menu">
+        <item>Profile</item>
+        <item>Log out</item>
+        <item>Search</item>
+    </string-array>
 </resources>

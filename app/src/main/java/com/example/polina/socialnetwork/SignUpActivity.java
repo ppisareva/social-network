@@ -27,7 +27,7 @@ public class SignUpActivity extends Activity {
     @App
     SNApp snApp;
 
-    SharedPreferences sharedPreferencesUserId;
+    SharedPreferences sharedPreferences;
     private String email;
     private String password;
     private String passwordToConfirm;
@@ -40,9 +40,9 @@ public class SignUpActivity extends Activity {
 
     @org.androidannotations.annotations.UiThread
     void check(JSONObject o) {
-        sharedPreferencesUserId =  getSharedPreferences(Utils.USER_ID_PREFERENCES, MODE_PRIVATE);
+        sharedPreferences =  getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
             try {
-                SharedPreferences.Editor ed = sharedPreferencesUserId.edit();
+                SharedPreferences.Editor ed = sharedPreferences.edit();
                 ed.putString(Utils.ID, o.getString(Utils.ID));
                 ed.commit();
             } catch (JSONException e) {

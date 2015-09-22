@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,6 +78,8 @@ public class PostDetailsActivity extends ActionBarActivity {
     int INTENT_EDIT = 0;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +98,35 @@ public class PostDetailsActivity extends ActionBarActivity {
         likeCount = (TextView) header.findViewById(R.id.like_count_details);
         location = (ImageView) header.findViewById(R.id.image_lication_details);
         commentsCount = (TextView) header.findViewById(R.id.comment_count_details);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.manu_post_details, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_delete) {
+            deletePost();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+@Background
+    public void deletePost() {
+    JSONObject o = snApp.api.deletePost(post.getPostId());
+    System.err.println(o);
+        back();
+
+    }
+    @UiThread
+    public void back() {
+        setResult(RESULT_OK, intent);
+        finish();
+
     }
 
     @Override
@@ -186,31 +219,6 @@ public class PostDetailsActivity extends ActionBarActivity {
         adapter.notifyDataSetChanged();
     }
 
-//    @Background
-//    public void loadLike() {
-//        JSONObject o = snApp.api.getLike(PostDetailsActivity.this, post_items.getPostId());
-//        System.out.println(o + "-----");
-//        if (o != null) {
-//            viewLikes(o);
-//        }
-//    }
-//
-//    @UiThread
-//    public void viewLikes(JSONObject o) {
-//        usersLiked = Utils.loadUsersLiked(o);
-//        if (!usersLiked.isEmpty()) {
-//            countLikes = usersLiked.size();
-//            likeCount.setText("" + countLikes);
-//        }
-//        for (User user : usersLiked) {
-//            if (user.userId.equals(idUser)) {
-//                checkBoxLike.setChecked(true);
-//                break;
-//            }
-//        }
-//    }
-
-
     public void loadPost() {
             postDate.setText(Utils.parseDate(post.getCreatedAt()));
             userName.setText(post.getName());
@@ -221,7 +229,7 @@ public class PostDetailsActivity extends ActionBarActivity {
         if(post.isOwnLike()){
             checkBoxLike.setChecked(true);
         }
-            if (post.getLatitude()!=null) {
+            if (!TextUtils.isEmpty(post.getLatitude())) {
                 location.setVisibility(View.VISIBLE);
                 location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
                 location.setOnClickListener(new View.OnClickListener() {

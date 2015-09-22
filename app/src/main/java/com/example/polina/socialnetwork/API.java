@@ -17,6 +17,7 @@ public interface API {
     public JSONObject getLoadPosts(String userId, int size, String postId);
     public JSONObject sendComment(String postId, String comment);
     public JSONObject getPost(String postId);
+    public JSONObject deletePost(String postId);
     public JSONObject getLike(String postId);
     public JSONObject getComments(String postId);
     public JSONObject editComment(String postId, String commentId, String comment) throws JSONException;

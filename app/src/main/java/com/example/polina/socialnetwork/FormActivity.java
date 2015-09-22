@@ -54,6 +54,7 @@ public class FormActivity extends Activity {
     private final static String FEMALE = "female";
     private final static String MALE = "male";
     String data[] = {FEMALE, MALE};
+    private String date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +74,9 @@ public class FormActivity extends Activity {
         if (o != null) {
             try {
                 name.setText(o.getString(Utils.NAME));
-                int y = Utils.calculateAmountYears(o.getString(Utils.BIRTHDAY));
+                date = o.getString(Utils.BIRTHDAY);
+                int y = Utils.calculateAmountYears(date);
+
                 String years = getResources().getQuantityString(R.plurals.years, y, y);
                 birthday.setText(years);
                 String profileURL = o.getString(Utils.PROF_URL);
@@ -129,7 +132,8 @@ public class FormActivity extends Activity {
 
     DatePickerDialog.OnDateSetListener callBackDataDialog = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            birthday.setText(String.format("%s/%s/%s", dayOfMonth, monthOfYear, year));
+            date = String.format("%s/%s/%s", dayOfMonth, monthOfYear, year);
+            birthday.setText(date);
         }
     };
 
@@ -177,7 +181,15 @@ public class FormActivity extends Activity {
                 imageURI = S3Helper.uploadImage(path);
                 miniImageURI = S3Helper.uploadImage(inputStream);
             }
-            JSONObject o = snApp.api.saveProfile(name.getText().toString(), birthday.getText().toString(), sex.getText().toString(), imageURI, miniImageURI);
+            JSONObject o = snApp.api.saveProfile(name.getText().toString(), date, sex.getText().toString(), imageURI, miniImageURI);
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(Utils.NAME, name.getText().toString());
+
+            editor.putString(Utils.BIRTHDAY, date);
+            editor.putString(Utils.PROF_URL, imageURI);
+            editor.commit();
+
             System.err.println(o);
             if (o != null) {
                 Intent intent = new Intent(FormActivity.this, ProfileActivity_.class);
