@@ -15,15 +15,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/search_name"
             android:hint="@string/search_name"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:imeOptions="actionSearch"
+            android:inputType="text"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/butt_search"
-            android:src="@drawable/ic_search_black_36dp"
-            android:background="@null"
-            android:layout_weight="0" />
 
     </LinearLayout>
 

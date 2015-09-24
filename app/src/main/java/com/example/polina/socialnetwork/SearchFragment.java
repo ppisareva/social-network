@@ -4,9 +4,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -39,6 +41,17 @@ public class SearchFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_search, null);
         snApp= (SNApp) getActivity().getApplication();
         searchName = (EditText) v.findViewById(R.id.search_name);
+        searchName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                System.err.println(" press onclick");
+                if(i== EditorInfo.IME_ACTION_SEARCH) {
+                    new LoadUsers().execute(searchName.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
         thisContext = container.getContext();
         ListView searchList = (ListView)v.findViewById(R.id.search_result);
         adapter = new SearchAdapter(users, thisContext, snApp.mImageLoader);
@@ -46,18 +59,11 @@ public class SearchFragment extends Fragment {
         searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                User user = (User)adapterView.getItemAtPosition(i);
+                User user = (User) adapterView.getItemAtPosition(i);
                 System.err.println(" user ID" + user.userId);
             }
         });
-        ImageButton button = (ImageButton)v.findViewById(R.id.butt_search);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.err.println(" press onclick");
-                new LoadUsers().execute(searchName.getText().toString());
-            }
-        });
+
         return v;
     }
 
