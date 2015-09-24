@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,13 +45,15 @@ public class ProfileActivity extends ActionBarActivity {
     private SharedPreferences sharedPreferences;
       private ActionBarDrawerToggle toggle;
     ProfileFragment profileFragment;
+    SearchFragment searchFragment;
     FragmentTransaction ft;
     private final int LOG_OUT = 1;
     private final int PROFILE = 0;
+    private final int SEARCH = 2;
     @AfterViews
     protected void init(){
 
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
@@ -66,7 +70,7 @@ public class ProfileActivity extends ActionBarActivity {
         left_menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                switch (i){
+                switch (i) {
                     case PROFILE:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
@@ -75,14 +79,16 @@ public class ProfileActivity extends ActionBarActivity {
                         CookieManager cookieManager = CookieManager.getInstance();
                         cookieManager.removeAllCookie();
                         sharedPreferences.edit().clear().commit();
-                       Intent intent = new Intent(ProfileActivity.this, IntroActivity.class);
+                        Intent intent = new Intent(ProfileActivity.this, IntroActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);;
+                        startActivity(intent);
+                        ;
                         break;
-                    case 2:
-                        System.out.println("Search");
+                    case SEARCH:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, searchFragment).commit();
                         break;
                 }
+                drawerLayout.closeDrawer(GravityCompat.START);
             }
         });
         ActionBar bar = getSupportActionBar();
@@ -102,6 +108,8 @@ public class ProfileActivity extends ActionBarActivity {
 
 
        profileFragment = new ProfileFragment();
+       searchFragment = new SearchFragment();
+
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_profile, profileFragment).commit();
     }
 

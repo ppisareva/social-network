@@ -63,7 +63,7 @@ public class ProfileFragment extends Fragment{
 
         snApp= (SNApp) getActivity().getApplication();
 
-        adapter = new PostAdapter(thisContext, posts,snApp.mImageLoader);
+        adapter = new PostAdapter(thisContext, posts, snApp.mImageLoader);
         connectionFailed = getResources().getString(R.string.connection_faild);
         postList =(ListView) v.findViewById(R.id.posts_list);
         postList.setAdapter(adapter);
@@ -122,7 +122,7 @@ public class ProfileFragment extends Fragment{
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem,
                              int visibleItemCount, int totalItemCount) {
-            System.err.println("id" + firstVisibleItem + "itams" + visibleItemCount + "totalItemCount" + totalItemCount);
+            System.err.println("id" + firstVisibleItem + "items" + visibleItemCount + "totalItemCount" + totalItemCount);
             if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount >1) {
                 if (loadingNow) {
                     loadingNow = false;
@@ -184,9 +184,8 @@ public class ProfileFragment extends Fragment{
               try {
                   posts.clear();
                   JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
-                  JSONObject jsonPost;
                   for (int i = 0; i < jsonArray.length(); i++) {
-                      jsonPost = jsonArray.getJSONObject(i);
+                      JSONObject jsonPost = jsonArray.getJSONObject(i);
                       posts.add(Post.parse(jsonPost));
                   }
                   idPost = (posts.size() > 0 ? posts.get(posts.size()-1).getPostId() : "");

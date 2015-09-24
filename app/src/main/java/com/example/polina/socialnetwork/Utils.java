@@ -62,6 +62,8 @@ public class Utils {
     public static  final String COMMENT_ID = "commentId";
     public static  final String POSITION = "position";
     public static  final String POST = "post_items";
+    public static  final String USERS = "users";
+
 
 
 

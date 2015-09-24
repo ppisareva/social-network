@@ -22,6 +22,7 @@ public interface API {
     public JSONObject getComments(String postId);
     public JSONObject editComment(String postId, String commentId, String comment) throws JSONException;
     public JSONObject deleteComment(String postId, String commentId);
+    public JSONObject findUsers (String name, int size);
 
 
 
