@@ -178,10 +178,10 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject findUsers(String name, int size) {
+    public JSONObject findUsers(String name, int offset) {
         List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("q", name));
-        params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + size));
+        params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
 
         String paramString = URLEncodedUtils.format(params, "UTF-8");
         System.err.println(" find URL " + getSearchUsers+paramString);
