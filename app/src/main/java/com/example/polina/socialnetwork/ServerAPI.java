@@ -5,6 +5,8 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 
+import com.amazonaws.org.apache.http.client.utils.URLEncodedUtils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -20,8 +22,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,6 +43,8 @@ public class ServerAPI implements API {
     private String getPost = HOST + "/post/%s";
     private String getLike = HOST + "/post/%s/like";
     private String deleteEditPost = HOST + "/user/me/post/%s";
+    private String getSearchUsers = HOST + "user/find?";
+
 
 
 
@@ -171,6 +175,17 @@ public class ServerAPI implements API {
     @Override
     public JSONObject deleteComment( String idPost, String idComment) {
         return deleteRequest( String.format(postGetComment, idPost) + "/" + idComment);
+    }
+
+    @Override
+    public JSONObject findUsers(String name, int size) {
+        List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
+        params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("q", name));
+        params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + size));
+
+        String paramString = URLEncodedUtils.format(params, "UTF-8");
+        System.err.println(" find URL " + getSearchUsers+paramString);
+        return getRequest(getSearchUsers+paramString);
     }
 
     private JSONObject logInSignUp(String email, String password, String path) {

@@ -54,4 +54,6 @@
         <item>Log out</item>
         <item>Search</item>
     </string-array>
+    <string name="search">search</string>
+    <string name="search_name">Enter search name</string>
 </resources>

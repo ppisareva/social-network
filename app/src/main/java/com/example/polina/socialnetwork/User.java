@@ -11,6 +11,7 @@ public class User {
     String userURL;
     String userName;
 
+
     public User(String userId, String userURL, String userName) {
         this.userId = userId;
         this.userURL = userURL;
