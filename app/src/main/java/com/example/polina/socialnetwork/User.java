@@ -20,8 +20,8 @@ public class User {
 
     public static User parse(JSONObject o){
         try {
-            return new User(o.getString(Utils.ID), o.getString(Utils.MINI_PROF_URL), o.getString(Utils.NAME));
-        } catch (JSONException e) {
+            return new User(o.optString(Utils.ID), o.optString(Utils.MINI_PROF_URL), o.optString(Utils.NAME));
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

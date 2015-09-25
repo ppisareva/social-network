@@ -1,6 +1,5 @@
 package com.example.polina.socialnetwork;
 
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -11,7 +10,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,13 +41,13 @@ public class ProfileActivity extends ActionBarActivity {
     public TextView name;
 
     private SharedPreferences sharedPreferences;
-      private ActionBarDrawerToggle toggle;
+    private ActionBarDrawerToggle toggle;
     ProfileFragment profileFragment;
-    SearchFragment searchFragment;
-    FragmentTransaction ft;
+    SearchActivity searchActivity;
     private final int LOG_OUT = 1;
     private final int PROFILE = 0;
     private final int SEARCH = 2;
+    private final int EDIT_PROFILE = 3;
     @AfterViews
     protected void init(){
 
@@ -68,10 +66,14 @@ public class ProfileActivity extends ActionBarActivity {
                 this,
                 android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.left_menu)));
         left_menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            Intent intent;
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i) {
                     case PROFILE:
+                        Bundle bundle = new Bundle();
+                        bundle.putString(Utils.USER_ID, Utils.MY_PROFILE);
+                        profileFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
                     case LOG_OUT:
@@ -79,13 +81,17 @@ public class ProfileActivity extends ActionBarActivity {
                         CookieManager cookieManager = CookieManager.getInstance();
                         cookieManager.removeAllCookie();
                         sharedPreferences.edit().clear().commit();
-                        Intent intent = new Intent(ProfileActivity.this, IntroActivity.class);
+                        intent = new Intent(ProfileActivity.this, IntroActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        ;
                         break;
                     case SEARCH:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, searchFragment).commit();
+                        intent = new Intent(ProfileActivity.this, SearchActivity.class);
+                        startActivity(intent);
+                        break;
+                    case EDIT_PROFILE:
+                        intent = new Intent(ProfileActivity.this, FormActivity_.class);
+                        startActivity(intent);
                         break;
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -108,11 +114,13 @@ public class ProfileActivity extends ActionBarActivity {
 
 
        profileFragment = new ProfileFragment();
-       searchFragment = new SearchFragment();
+       searchActivity = new SearchActivity();
 
+        Bundle bundle = new Bundle();
+        bundle.putString(Utils.USER_ID, Utils.MY_PROFILE);
+        profileFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_profile, profileFragment).commit();
     }
-
 
     public void onPost(View v) {
         Intent intent = new Intent(this, CreatePostActivity_.class);

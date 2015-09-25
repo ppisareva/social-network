@@ -34,6 +34,7 @@ public class ServerAPI implements API {
     private String logInPath = HOST + "user/login";
     private String sighUpPath = HOST + "user/register";
     private String userInfoPath = HOST + "/user/me";
+    private String getUser = HOST + "/user/";
     private String postPath = HOST + "/post";
     private String postGetPath = HOST + "/timeline/";
     private String postLoadPost = "?limit=%d&before=%s";
@@ -123,6 +124,11 @@ public class ServerAPI implements API {
     }
 
     @Override
+    public JSONObject getUser(String userId) {
+        return getRequest(getUser+userId);
+    }
+
+    @Override
     public JSONObject getLoadPosts( String idUser, int size,  String idPost) {
         if(idPost.isEmpty()){
             return getRequest( postGetPath + idUser);
@@ -169,12 +175,12 @@ public class ServerAPI implements API {
     public JSONObject editComment( String idPost, String idComment, String comment) throws JSONException {
         JSONObject o = new JSONObject();
         o.put(Utils.COMMENT, comment);
-        return putRequest( o, String.format(postGetComment, idPost) +"/" +idComment);
+        return putRequest(o, String.format(postGetComment, idPost) + "/" + idComment);
     }
 
     @Override
     public JSONObject deleteComment( String idPost, String idComment) {
-        return deleteRequest( String.format(postGetComment, idPost) + "/" + idComment);
+        return deleteRequest(String.format(postGetComment, idPost) + "/" + idComment);
     }
 
     @Override
@@ -185,7 +191,7 @@ public class ServerAPI implements API {
 
         String paramString = URLEncodedUtils.format(params, "UTF-8");
         System.err.println(" find URL " + getSearchUsers+paramString);
-        return getRequest(getSearchUsers+paramString);
+        return getRequest(getSearchUsers + paramString);
     }
 
     private JSONObject logInSignUp(String email, String password, String path) {

@@ -13,6 +13,8 @@ public interface API {
     public JSONObject signUp (String email, String password);
     public JSONObject saveProfile(String name, String birthday, String sex, String imageUrl, String imageMiniUrl);
     public  JSONObject getProfile();
+    public  JSONObject getUser(String userId);
+
     public JSONObject newPost (String message, JSONObject location,  String image, String account);
     public JSONObject getLoadPosts(String userId, int size, String postId);
     public JSONObject sendComment(String postId, String comment);

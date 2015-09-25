@@ -41,21 +41,21 @@ public class SignUpActivity extends Activity {
     @org.androidannotations.annotations.UiThread
     void check(JSONObject o) {
         sharedPreferences =  getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+        if(o!=null) {
             try {
                 SharedPreferences.Editor ed = sharedPreferences.edit();
-                ed.putString(Utils.ID, o.getString(Utils.ID));
+                ed.putString(Utils.ID, o.optString(Utils.ID));
                 ed.commit();
-            } catch (JSONException e) {
+                Intent intent = new Intent(this, FormActivity_.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        if (o == null) {
+        }  else {
             registrationFail.setText(R.string.registration_faild);
             registrationFail.setVisibility(View.VISIBLE);
             return;
-        } else {
-            Intent intent = new Intent(this, FormActivity_.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
         }
     }
 
