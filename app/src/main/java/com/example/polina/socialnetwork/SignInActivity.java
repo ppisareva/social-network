@@ -3,6 +3,7 @@ package com.example.polina.socialnetwork;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,7 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @EActivity(R.layout.sign_in)
-public class SignInActivity extends Activity {
+public class SignInActivity extends AppCompatActivity {
     @ViewById(R.id.email_sign_in)
     public TextView em;
     @ViewById(R.id.password_sign_in)

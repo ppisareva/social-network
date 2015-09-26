@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +35,7 @@ import org.json.JSONObject;
 import java.io.File;
 
 @EActivity(R.layout.activity_create_post)
-public class CreatePostActivity extends ActionBarActivity {
+public class CreatePostActivity extends AppCompatActivity {
     @App
     SNApp snApp;
     @ViewById(R.id.post_text)

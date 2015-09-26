@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -45,7 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @EActivity(R.layout.activity_post_details)
-public class PostDetailsActivity extends ActionBarActivity {
+public class PostDetailsActivity extends AppCompatActivity {
 
     @App
     SNApp snApp;

@@ -37,6 +37,7 @@ public class Utils {
     public static final String SEX = "sex";
     public static final String PROF_URL = "profile_url";
     public static final String MINI_PROF_URL = "mini_profile_url";
+    public static final String MY_PROFILE = "my_profile";
     public static final String POST_ACCOUNT = "account";
     public static final String POST_LOCATION = "location";
     public static final String POST_IMAGE = "image";
@@ -50,7 +51,7 @@ public class Utils {
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
     public static final String IMAGE = "image";
-    public static final String USER_ID_PREFERENCES = "User ID";
+    public static final String USER_ID = "User ID";
     public static final String POSTS_JSON = "posts";
     public static final String LIKE_JSON = "users";
     public static final String LIKES_COUNT = "likes_count";
@@ -63,6 +64,8 @@ public class Utils {
     public static  final String POSITION = "position";
     public static  final String POST = "post_items";
     public static  final String USERS = "users";
+    public static  final String FOLLOWERS_COUNT = "followers_count";
+    public static  final String FOLLOWING_COUNT = "following_count";
 
 
 

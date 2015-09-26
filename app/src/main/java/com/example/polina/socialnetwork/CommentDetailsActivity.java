@@ -3,6 +3,7 @@ package com.example.polina.socialnetwork;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -15,7 +16,7 @@ import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 
 @EActivity(R.layout.activity_comment_details)
-public class CommentDetailsActivity extends ActionBarActivity {
+public class CommentDetailsActivity extends AppCompatActivity {
 
     @App
     SNApp snApp;

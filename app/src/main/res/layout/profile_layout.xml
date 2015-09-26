@@ -19,22 +19,53 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:paddingLeft="5dp">
+        android:layout_marginRight="5dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/prof_name"
             android:textSize="22dp"
-            android:singleLine="false" />
+            android:singleLine="false"
+            android:layout_marginLeft="5dp" />
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/prof_bday"
             android:textSize="15dp"
-            android:paddingTop="10dp"
-            android:layout_weight="1" />
+            android:paddingTop="5dp"
+            android:layout_marginLeft="5dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/followers"
+                android:id="@+id/button_followers"
+                android:onClick="onFollowers"
+                android:layout_weight="1"
+                android:textSize="10dp"
+                android:background="@null"
+                android:gravity="center_vertical" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/followings"
+                android:onClick="onFollowings"
+                android:id="@+id/button_followings"
+                android:layout_weight="1"
+                android:textSize="10dp"
+                android:background="@null"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
 
         <Button
             android:layout_width="match_parent"
@@ -42,7 +73,14 @@
             android:text="@string/button_post"
             android:onClick="onPost"
             android:id="@+id/button_post_activity"
-            android:layout_weight="0" />
+            android:visibility="gone"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New CheckBox"
+            android:id="@+id/checkBoxFollow"
+            android:visibility="gone"/>
 
     </LinearLayout>
 </LinearLayout>
