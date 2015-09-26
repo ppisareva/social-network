@@ -153,8 +153,10 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         if (isChecked) {
+            followersCount.setText(String.valueOf(++followerAmount));
             checkBoxFollow.setText(getResources().getString(R.string.unfollow));
         } else {
+            followersCount.setText(String.valueOf(--followerAmount));
             checkBoxFollow.setText(getResources().getString(R.string.follow));
         }
         final String url = ServerAPI.HOST + "user/" + userId + "/follow";
@@ -170,7 +172,7 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
                 return headers;
             }
         });
-        new LoadFollow().execute();
+
     }
 
 };
