@@ -52,7 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
     @AfterViews
     protected void init(){
 
-        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+
         final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this,
@@ -69,6 +69,7 @@ public class ProfileActivity extends AppCompatActivity {
                 android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.left_menu)));
         left_menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             Intent intent;
+
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i) {
@@ -113,6 +114,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
         bundle.putString(Utils.USER_ID, sharedPreferences.getString(Utils.ID, ""));
