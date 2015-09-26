@@ -59,9 +59,10 @@
     <string name="search_name">Enter search name</string>
     <string name="followings">Followings</string>
     <string name="followers">Followers</string>
-    <string name="follow">follow</string>
-    <string name="unfollow">unfollow</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
     <string name="title_activity_user">UserActivity</string>
     <string name="no_users">No users found</string>
     <string name="my_profile"> (my profile) </string>
+
 </resources>

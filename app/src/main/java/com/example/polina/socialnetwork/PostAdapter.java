@@ -133,7 +133,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
             else
                 --post.likeCount;
             notifyDataSetChanged();
-            final String url = ServerAPI.HOST + "post_items/" + post.getPostId() + "/like";
+            final String url = ServerAPI.HOST + "post/" + post.getPostId() + "/like";
             System.err.println(url);
             queue.add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
                 @Override

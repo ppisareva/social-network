@@ -43,27 +43,41 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp">
 
-            <Button
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/follower_count" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/followers"
                 android:id="@+id/button_followers"
+                android:clickable="true"
                 android:onClick="onFollowers"
                 android:layout_weight="1"
                 android:textSize="10dp"
                 android:background="@null"
-                android:gravity="center_vertical" />
+                android:gravity="center_vertical"
+                android:layout_marginLeft="5dp" />
 
-            <Button
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/following_count" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/followings"
+                android:clickable="true"
                 android:onClick="onFollowings"
                 android:id="@+id/button_followings"
                 android:layout_weight="1"
                 android:textSize="10dp"
                 android:background="@null"
-                android:gravity="center_vertical" />
+                android:gravity="center_vertical"
+                android:layout_marginLeft="5dp" />
 
         </LinearLayout>
 
@@ -78,7 +92,7 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New CheckBox"
+            android:text="@string/follow"
             android:id="@+id/checkBoxFollow"
             android:visibility="gone"/>
 
