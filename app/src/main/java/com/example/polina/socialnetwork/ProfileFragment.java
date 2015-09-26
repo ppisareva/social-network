@@ -1,4 +1,5 @@
 package com.example.polina.socialnetwork;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -125,10 +126,8 @@ public class ProfileFragment extends Fragment {
         System.err.println("user id " + userId);
         if (sharedPreferences.contains(Utils.NAME) && myProfile) {
             loadProfileFromMemory(sharedPreferences);
-            new LoadFollow().execute();
-        } else {
-           new LoadProfile().execute();
         }
+        new LoadProfile().execute();
         new LoadPost().execute();
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -145,37 +144,31 @@ public class ProfileFragment extends Fragment {
         return v;
     }
 
-
-
-
-
-CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnCheckedChangeListener() {
-    @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-        if (isChecked) {
-            followersCount.setText(String.valueOf(++followerAmount));
-            checkBoxFollow.setText(getResources().getString(R.string.unfollow));
-        } else {
-            followersCount.setText(String.valueOf(--followerAmount));
-            checkBoxFollow.setText(getResources().getString(R.string.follow));
-        }
-        final String url = ServerAPI.HOST + "user/" + userId + "/follow";
-        System.err.println(url);
-        RequestQueue queue = Volley.newRequestQueue(thisContext);
-        queue.add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                CookieSyncManager.createInstance(thisContext);
-                CookieManager cookieManager = CookieManager.getInstance();
-                headers.put("Cookie", cookieManager.getCookie(url));
-                return headers;
+    CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            if (isChecked) {
+                followersCount.setText(String.valueOf(++followerAmount));
+                checkBoxFollow.setText(getResources().getString(R.string.unfollow));
+            } else {
+                followersCount.setText(String.valueOf(--followerAmount));
+                checkBoxFollow.setText(getResources().getString(R.string.follow));
             }
-        });
-
-    }
-
-};
+            final String url = ServerAPI.HOST + "user/" + userId + "/follow";
+            System.err.println(url);
+            RequestQueue queue = Volley.newRequestQueue(thisContext);
+            queue.add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<String, String>();
+                    CookieSyncManager.createInstance(thisContext);
+                    CookieManager cookieManager = CookieManager.getInstance();
+                    headers.put("Cookie", cookieManager.getCookie(url));
+                    return headers;
+                }
+            });
+        }
+    };
 
     private final static Response.Listener<String> LISTENER = new Response.Listener<String>() {
         @Override
@@ -199,45 +192,25 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
         public void onScroll(AbsListView view, int firstVisibleItem,
                              int visibleItemCount, int totalItemCount) {
             System.err.println("id" + firstVisibleItem + "items" + visibleItemCount + "totalItemCount" + totalItemCount);
-            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount >1) {
+            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 1) {
                 if (loadingNow) {
                     loadingNow = false;
 
-                   LoadPostList loadPostList = new LoadPostList();
+                    LoadPostList loadPostList = new LoadPostList();
                     loadPostList.execute();
                 }
             }
         }
     };
 
-    class LoadFollow extends AsyncTask<Void, Void, JSONObject>{
 
-        @Override
-        protected JSONObject doInBackground(Void... voids) {
-             return snApp.api.getUser(userId);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject o) {
-            try {
-                followerAmount = Integer.parseInt(o.getString(Utils.FOLLOWERS_COUNT));
-                followersCount.setText(o.getString(Utils.FOLLOWERS_COUNT));
-                followingCount.setText(o.getString(Utils.FOLLOWING_COUNT));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-
-    class LoadPostList extends AsyncTask<Void, Void, JSONObject>{
+    class LoadPostList extends AsyncTask<Void, Void, JSONObject> {
 
         @Override
         protected JSONObject doInBackground(Void... voids) {
             System.out.println("------------------------------" + userId + "    " + postId);
             if (!postId.isEmpty()) {
-                    return snApp.api.getLoadPosts(userId, totalPost, postId);
+                return snApp.api.getLoadPosts(userId, totalPost, postId);
             }
             return null;
         }
@@ -252,7 +225,7 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
                         jsonPost = jsonArray.getJSONObject(i);
                         posts.add(Post.parse(jsonPost));
                     }
-                    postId = (posts.size() > 0 ? posts.get(posts.size()-1).getPostId() : "");
+                    postId = (posts.size() > 0 ? posts.get(posts.size() - 1).getPostId() : "");
                     updateAdapter();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -262,32 +235,31 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
     }
 
 
-  class LoadPost extends AsyncTask<Void, Void, JSONObject>{
+    class LoadPost extends AsyncTask<Void, Void, JSONObject> {
 
-      @Override
-      protected JSONObject doInBackground(Void... voids) {
-              return snApp.api.getLoadPosts(userId, totalPost, "");
-      }
+        @Override
+        protected JSONObject doInBackground(Void... voids) {
+            return snApp.api.getLoadPosts(userId, totalPost, "");
+        }
 
-      @Override
-      protected void onPostExecute(JSONObject o) {
-          if (o != null) {
-              try {
-                  posts.clear();
-                  JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
-                  for (int i = 0; i < jsonArray.length(); i++) {
-                      JSONObject jsonPost = jsonArray.getJSONObject(i);
-                      posts.add(Post.parse(jsonPost));
-                  }
-                  postId = (posts.size() > 0 ? posts.get(posts.size()-1).getPostId() : "");
-                  updateAdapter();
-              } catch (Exception e) {
-                  e.printStackTrace();
-              }
-          }
-      }
-  }
-
+        @Override
+        protected void onPostExecute(JSONObject o) {
+            if (o != null) {
+                try {
+                    posts.clear();
+                    JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonPost = jsonArray.getJSONObject(i);
+                        posts.add(Post.parse(jsonPost));
+                    }
+                    postId = (posts.size() > 0 ? posts.get(posts.size() - 1).getPostId() : "");
+                    updateAdapter();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 
     public void updateAdapter() {
@@ -295,7 +267,7 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
         loadingNow = true;
     }
 
-    class LoadProfile extends AsyncTask<Void, Void, JSONObject>{
+    class LoadProfile extends AsyncTask<Void, Void, JSONObject> {
 
 
         @Override
@@ -305,40 +277,39 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
 
         @Override
         protected void onPostExecute(JSONObject o) {
-           if(o!=null){
-               try {
-                   if(myProfile){
-                       postSend.setVisibility(View.VISIBLE);
-                   } else {
-                       checkBoxFollow.setVisibility(View.VISIBLE);
-                   }
-                   name.setText(o.getString(Utils.NAME));
+            if (o != null) {
+                try {
+                    if (myProfile) {
+                        postSend.setVisibility(View.VISIBLE);
+                    } else {
+                        checkBoxFollow.setVisibility(View.VISIBLE);
+                    }
+                    name.setText(o.getString(Utils.NAME));
+                    followerAmount = Integer.parseInt(o.getString(Utils.FOLLOWERS_COUNT));
+                    followersCount.setText(o.getString(Utils.FOLLOWERS_COUNT));
+                    followingCount.setText(o.getString(Utils.FOLLOWING_COUNT));
+                    int y = Utils.calculateAmountYears(o.getString(Utils.BIRTHDAY));
+                    String years = getResources().getQuantityString(R.plurals.years, y, y);
+                    birthday.setText(years);
+                    System.err.println(o.getString(Utils.PROF_URL));
+                    image.setImageUrl(o.getString(Utils.PROF_URL), snApp.mImageLoader);
 
-                   followerAmount = Integer.getInteger(o.getString(Utils.FOLLOWERS_COUNT));
-                   followersCount.setText(followerAmount);
-                   followingCount.setText(o.getString(Utils.FOLLOWING_COUNT));
-                   int y = Utils.calculateAmountYears(o.getString(Utils.BIRTHDAY));
-                   String years = getResources().getQuantityString(R.plurals.years, y, y);
-                   birthday.setText(years);
-                   System.err.println(o.getString(Utils.PROF_URL));
-                   image.setImageUrl(o.getString(Utils.PROF_URL), snApp.mImageLoader);
+                    if (myProfile) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(Utils.FOLLOWERS_COUNT, o.getString(Utils.FOLLOWERS_COUNT));
+                        editor.putString(Utils.FOLLOWING_COUNT, o.getString(Utils.FOLLOWING_COUNT));
+                        editor.putString(Utils.NAME, o.getString(Utils.NAME));
+                        editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
+                        editor.putString(Utils.PROF_URL, o.getString(Utils.PROF_URL));
+                        editor.commit();
+                    }
 
-                   if(myProfile) {
-                       SharedPreferences.Editor editor = sharedPreferences.edit();
-                       editor.putString(Utils.FOLLOWERS_COUNT, o.getString(Utils.FOLLOWERS_COUNT));
-                       editor.putString(Utils.FOLLOWING_COUNT, o.getString(Utils.FOLLOWING_COUNT));
-                       editor.putString(Utils.NAME, o.getString(Utils.NAME));
-                       editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
-                       editor.putString(Utils.PROF_URL, o.getString(Utils.PROF_URL));
-                       editor.commit();
-                   }
-
-               } catch (Exception e) {
-                   e.printStackTrace();
-               }
-           } else {
-               Toast.makeText(thisContext, connectionFailed, Toast.LENGTH_LONG).show();
-           }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(thisContext, connectionFailed, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -355,6 +326,6 @@ CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnC
     @Override
     public void onResume() {
         super.onResume();
-        new LoadFollow().execute();
+        new LoadProfile().execute();
     }
 }
