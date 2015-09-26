@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,7 +29,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.profile_activity)
-public class ProfileActivity extends ActionBarActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     @App
     SNApp snApp;
@@ -51,6 +52,7 @@ public class ProfileActivity extends ActionBarActivity {
     @AfterViews
     protected void init(){
 
+        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this,
@@ -72,7 +74,7 @@ public class ProfileActivity extends ActionBarActivity {
                 switch (i) {
                     case PROFILE:
                         Bundle bundle = new Bundle();
-                        bundle.putString(Utils.USER_ID, Utils.MY_PROFILE);
+                        bundle.putString(Utils.USER_ID, sharedPreferences.getString(Utils.ID, ""));
                         profileFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
@@ -104,20 +106,16 @@ public class ProfileActivity extends ActionBarActivity {
         bar.setHomeButtonEnabled(true);
         bar.setDisplayShowHomeEnabled(true);
 
-        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-       profileFragment = new ProfileFragment();
-       searchActivity = new SearchActivity();
-
+        profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(Utils.USER_ID, Utils.MY_PROFILE);
+        bundle.putString(Utils.USER_ID, sharedPreferences.getString(Utils.ID, ""));
         profileFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_profile, profileFragment).commit();
     }

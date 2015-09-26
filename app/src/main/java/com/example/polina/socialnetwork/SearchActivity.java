@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -32,7 +36,7 @@ import java.util.ArrayList;
  * Created by polina on 22.09.15.
  */
 
-public class SearchActivity extends Activity {
+public class SearchActivity extends AppCompatActivity {
 
     SNApp snApp;
     ArrayList<User> users = new ArrayList<>();
@@ -44,6 +48,7 @@ public class SearchActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         setContentView(R.layout.search_activity);
         snApp = (SNApp) getApplication();
@@ -69,11 +74,7 @@ public class SearchActivity extends Activity {
                 User user = (User) adapterView.getItemAtPosition(i);
                 System.err.println(" user ID" + user.userId);
                 Intent intent = new Intent(SearchActivity.this, UserActivity.class);
-                if(user.userId.equals(sharedPreferences.getString(Utils.ID, ""))){
-                    intent.putExtra(Utils.USER_ID, Utils.MY_PROFILE);
-                } else {
-                    intent.putExtra(Utils.USER_ID, user.userId);
-                }
+                intent.putExtra(Utils.USER_ID, user.userId);
                 startActivity(intent);
             }
         });
@@ -86,7 +87,7 @@ public class SearchActivity extends Activity {
 
         @Override
         protected JSONObject doInBackground(String... strings) {
-            if (!strings[0].isEmpty()) {
+            if (!TextUtils.isEmpty(strings[0])) {
                 return snApp.api.findUsers(strings[0], 0);
             }
             System.err.println(" don't state user name");
@@ -98,6 +99,7 @@ public class SearchActivity extends Activity {
             System.out.println(jsonObject);
             if (jsonObject != null) {
                 try {
+                    users.clear();
                     JSONArray jsonArray = jsonObject.getJSONArray(Utils.USERS);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonPost = jsonArray.getJSONObject(i);
@@ -118,6 +120,23 @@ public class SearchActivity extends Activity {
 
 
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_user, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     class SearchAdapter extends BaseAdapter {

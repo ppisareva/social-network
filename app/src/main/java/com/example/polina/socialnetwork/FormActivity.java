@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -30,7 +31,7 @@ import java.net.URL;
 
 
 @EActivity(R.layout.form_activity)
-public class FormActivity extends Activity {
+public class FormActivity extends AppCompatActivity {
 
     @ViewById(R.id.form_name)
     public TextView name;
