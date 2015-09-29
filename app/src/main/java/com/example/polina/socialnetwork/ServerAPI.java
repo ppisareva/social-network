@@ -45,6 +45,8 @@ public class ServerAPI implements API {
     private String getLike = HOST + "/post/%s/like";
     private String deleteEditPost = HOST + "/user/me/post/%s";
     private String getSearchUsers = HOST + "user/find?";
+    private String getFollowerUsers = HOST + "user/%s/followers?";
+    private String getFollowingUsers = HOST + "user/%s/following?";
 
 
 
@@ -192,6 +194,22 @@ public class ServerAPI implements API {
         String paramString = URLEncodedUtils.format(params, "UTF-8");
         System.err.println(" find URL " + getSearchUsers+paramString);
         return getRequest(getSearchUsers + paramString);
+    }
+
+    @Override
+    public JSONObject getFollowers(String id, int offset) {
+        List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
+        params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
+        String paramString = URLEncodedUtils.format(params, "UTF-8");
+        return getRequest(String.format(getFollowerUsers, id) + paramString);
+    }
+
+    @Override
+    public JSONObject getFollowing(String id, int offset) {
+        List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
+        params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
+        String paramString = URLEncodedUtils.format(params, "UTF-8");
+        return getRequest(String.format(getFollowingUsers, id) + paramString);
     }
 
     private JSONObject logInSignUp(String email, String password, String path) {

@@ -57,12 +57,13 @@
     </string-array>
     <string name="search">search</string>
     <string name="search_name">Enter search name</string>
-    <string name="followings">Followings</string>
+    <string name="followings">Following</string>
     <string name="followers">Followers</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
     <string name="title_activity_user">UserActivity</string>
     <string name="no_users">No users found</string>
     <string name="my_profile"> (my profile) </string>
+    <string name="title_activity_follow">FollowActivity</string>
 
 </resources>

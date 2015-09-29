@@ -3,12 +3,12 @@ package com.example.polina.socialnetwork;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -27,6 +27,10 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashSet;
 
 @EActivity(R.layout.profile_activity)
 public class ProfileActivity extends AppCompatActivity {
@@ -44,7 +48,6 @@ public class ProfileActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private ActionBarDrawerToggle toggle;
     ProfileFragment profileFragment;
-    SearchActivity searchActivity;
     private final int LOG_OUT = 1;
     private final int PROFILE = 0;
     private final int SEARCH = 2;
@@ -75,7 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
                 switch (i) {
                     case PROFILE:
                         Bundle bundle = new Bundle();
-                        bundle.putString(Utils.USER_ID, sharedPreferences.getString(Utils.ID, ""));
+                        bundle.putString(Utils.USER_ID, snApp.getUserId());
                         profileFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
@@ -117,9 +120,10 @@ public class ProfileActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(Utils.USER_ID, sharedPreferences.getString(Utils.ID, ""));
+        bundle.putString(Utils.USER_ID, snApp.getUserId());
         profileFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_profile, profileFragment).commit();
+        new LoadFollowing().execute();
     }
 
     public void onPost(View v) {
@@ -132,6 +136,31 @@ public class ProfileActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+
+    class LoadFollowing extends AsyncTask<Void, Void, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(Void... voids) {
+            return snApp.api.getFollowing(snApp.getUserId(), 0);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            if (jsonObject != null) {
+                try {
+                    HashSet<String> users = new HashSet<>();
+                    JSONArray jsonArray = jsonObject.getJSONArray(Utils.USERS);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        User user = User.parse(jsonArray.getJSONObject(i));
+                        users.add(user.userId);
+                    }
+                    snApp.setFollowerIds(users);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
