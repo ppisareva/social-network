@@ -46,6 +46,7 @@ public class SignUpActivity extends AppCompatActivity {
             try {
                 SharedPreferences.Editor ed = sharedPreferences.edit();
                 ed.putString(Utils.ID, o.optString(Utils.ID));
+                snApp.setUserId(o.optString(Utils.ID));
                 ed.commit();
                 Intent intent = new Intent(this, FormActivity_.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

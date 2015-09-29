@@ -36,13 +36,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
  * Created by polina on 15.09.15.
  */
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     SNApp snApp;
     public ListView postList;
@@ -81,19 +82,22 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_user_profile, null);
         sharedPreferences = this.getActivity().getSharedPreferences(Utils.PROFILE_PREFERENCES, thisContext.MODE_PRIVATE);
+        snApp = (SNApp) getActivity().getApplication();
         Bundle bundle = this.getArguments();
         userId = bundle.getString(Utils.USER_ID);
-        if (userId.equals(sharedPreferences.getString(Utils.ID, ""))) {
+        if (userId.equals(snApp.getUserId())) {
             myProfile = true;
-            userId = sharedPreferences.getString(Utils.ID, "");
+            userId = snApp.getUserId();
         }
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout);
         thisContext = container.getContext();
 
         header = (ViewGroup) inflater.inflate(R.layout.profile_layout, postList, false);
         followers = (TextView) header.findViewById(R.id.button_followers);
+        followers.setOnClickListener(this);
         followersCount = (TextView) header.findViewById(R.id.follower_count);
         following = (TextView) header.findViewById(R.id.button_followings);
+        following.setOnClickListener(this);
         followingCount = (TextView) header.findViewById(R.id.following_count);
         checkBoxFollow = (CheckBox) header.findViewById(R.id.checkBoxFollow);
         checkBoxFollow.setOnCheckedChangeListener(myChangeListener);
@@ -102,7 +106,7 @@ public class ProfileFragment extends Fragment {
         image = (NetworkImageView) header.findViewById(R.id.prof_image);
         name = (TextView) header.findViewById(R.id.prof_name);
 
-        snApp = (SNApp) getActivity().getApplication();
+
 
         adapter = new PostAdapter(thisContext, posts, snApp.mImageLoader);
         connectionFailed = getResources().getString(R.string.connection_faild);
@@ -141,8 +145,20 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        if(!myProfile){
+            HashSet<String> users = snApp.getUserIDHashSet();
+            if(users.contains(userId)){
+                checkBoxFollow.setOnCheckedChangeListener(null);
+                checkBoxFollow.setChecked(true);
+                checkBoxFollow.setText(R.string.unfollow);
+                checkBoxFollow.setOnCheckedChangeListener(myChangeListener);
+            }
+        }
+
         return v;
     }
+
+
 
     CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
@@ -203,6 +219,21 @@ public class ProfileFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(thisContext, FollowActivity.class);
+        intent.putExtra(Utils.USER_ID, userId);
+
+        switch (view.getId()){
+            case R.id.button_followers:
+               intent.putExtra(Utils.FOLLOWER, true);
+                break;
+            case R.id.button_followings:
+                intent.putExtra(Utils.FOLLOWER, false);
+                break;
+        }
+        startActivity(intent);
+    }
 
     class LoadPostList extends AsyncTask<Void, Void, JSONObject> {
 

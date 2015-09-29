@@ -1,6 +1,7 @@
 package com.example.polina.socialnetwork;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 import android.webkit.CookieSyncManager;
@@ -10,6 +11,8 @@ import com.android.volley.toolbox.Volley;
 
 import org.androidannotations.annotations.EApplication;
 
+import java.util.HashSet;
+
 /**
  * Created by polina on 04.06.15.
  */
@@ -17,12 +20,33 @@ import org.androidannotations.annotations.EApplication;
 public class SNApp extends Application {
     API api = new ServerAPI();
     ImageLoader mImageLoader;
+    String userId;
+    HashSet<String> userIDHashSet;
 
+    public HashSet<String> getUserIDHashSet() {
+        return userIDHashSet;
+    }
+
+    public void setUserIDHashSet(HashSet<String> userIDHashSet) {
+        this.userIDHashSet = userIDHashSet;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     @Override
     public void onCreate() {
         CookieSyncManager.createInstance(getApplicationContext());
         super.onCreate();
+
+        SharedPreferences sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+        userId = sharedPreferences.getString(Utils.ID, "");
+
         mImageLoader = new ImageLoader(Volley.newRequestQueue(this.getApplicationContext()), new ImageLoader.ImageCache() {
             private final LruCache<String, Bitmap> mCache = new LruCache<>(40);
 

@@ -47,6 +47,7 @@ public class SignInActivity extends AppCompatActivity {
         try {
             SharedPreferences.Editor ed = sharedPreferences.edit();
             ed.putString(Utils.ID, o.getString(Utils.ID));
+            snApp.setUserId(o.getString(Utils.ID));
             ed.commit();
         } catch (JSONException e) {
             e.printStackTrace();

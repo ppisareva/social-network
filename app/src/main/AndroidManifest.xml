@@ -67,6 +67,10 @@
             android:name=".UserActivity"
             android:label="@string/title_activity_user" >
         </activity>
+        <activity
+            android:name=".FollowActivity"
+            android:label="@string/title_activity_follow" >
+        </activity>
     </application>
 
 </manifest>

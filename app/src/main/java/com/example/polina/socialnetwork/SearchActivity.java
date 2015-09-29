@@ -40,16 +40,13 @@ public class SearchActivity extends AppCompatActivity {
 
     SNApp snApp;
     ArrayList<User> users = new ArrayList<>();
-    SearchAdapter adapter;
+    UsersListAdapter adapter;
     EditText searchName;
-    private SharedPreferences sharedPreferences;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         setContentView(R.layout.search_activity);
         snApp = (SNApp) getApplication();
         searchName = (EditText) findViewById(R.id.search_name);
@@ -66,7 +63,7 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         ListView searchList = (ListView) findViewById(R.id.search_result);
-        adapter = new SearchAdapter(users, this, snApp.mImageLoader);
+        adapter = new UsersListAdapter(users, this, snApp.mImageLoader);
         searchList.setAdapter(adapter);
         searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -139,52 +136,5 @@ public class SearchActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    class SearchAdapter extends BaseAdapter {
-
-        ArrayList<User> users;
-        Context context;
-        LayoutInflater inflater;
-        ImageLoader imageLoader;
-
-        public SearchAdapter(ArrayList<User> users, Context context, ImageLoader imageLoader) {
-            super();
-            this.users = users;
-            this.context = context;
-            this.imageLoader = imageLoader;
-            inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        }
-
-        @Override
-        public int getCount() {
-            return users.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return users.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            if (view == null) {
-                view = inflater.inflate(R.layout.search_users_list, null);
-            }
-            User user = (User) getItem(i);
-            String userName = user.userName;
-            if (user.userId.equals(sharedPreferences.getString(Utils.ID, ""))) {
-                userName += " " + getResources().getString(R.string.my_profile);
-            }
-            ((TextView) view.findViewById(R.id.search_list_name)).setText(userName);
-            ((NetworkImageView) view.findViewById(R.id.search_list_image)).setImageUrl(user.userURL, imageLoader);
-            return view;
-        }
-    }
 
 }
