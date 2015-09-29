@@ -119,15 +119,14 @@ public class PostDetailsActivity extends AppCompatActivity {
 @Background
     public void deletePost() {
     JSONObject o = snApp.api.deletePost(post.getPostId());
-    System.err.println(o);
+    System.err.println("delet post "+o);
         back();
 
     }
     @UiThread
     public void back() {
-        setResult(RESULT_OK, intent);
+        setResult(Utils.RESULT, intent);
         finish();
-
     }
 
     @Override
@@ -162,7 +161,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == INTENT_EDIT && RESULT_OK == resultCode) {
+        if (requestCode == INTENT_EDIT && Utils.RESULT == resultCode) {
             Bundle bundle = data.getExtras();
             if (bundle != null) {
                 String commentFromIntent = bundle.getString(Utils.COMMENT);
@@ -178,6 +177,7 @@ public class PostDetailsActivity extends AppCompatActivity {
     @Background
     public void deleteComment(String postId, String commentID) {
         JSONObject o = snApp.api.deleteComment(postId, commentID);
+        System.out.println(o);
     }
 
     @AfterViews

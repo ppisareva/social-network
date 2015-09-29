@@ -52,6 +52,8 @@ public class ProfileActivity extends AppCompatActivity {
     private final int PROFILE = 0;
     private final int SEARCH = 2;
     private final int EDIT_PROFILE = 3;
+    private final int FEED = 4;
+
     @AfterViews
     protected void init(){
 
@@ -98,6 +100,10 @@ public class ProfileActivity extends AppCompatActivity {
                     case EDIT_PROFILE:
                         intent = new Intent(ProfileActivity.this, FormActivity_.class);
                         startActivity(intent);
+                        break;
+                    case FEED:
+                        FeedFragment feedFragment = new FeedFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, feedFragment).commit();
                         break;
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);

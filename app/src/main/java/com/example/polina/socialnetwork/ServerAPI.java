@@ -40,13 +40,15 @@ public class ServerAPI implements API {
     private String postLoadPost = "?limit=%d&before=%s";
     private static final String MAIL = "email";
     private static final String PASSWORD = "password";
-    private String postGetComment = HOST + "/post/%s/comment";
+    private String postGetComment = HOST + "post/%s/comment";
     private String getPost = HOST + "/post/%s";
     private String getLike = HOST + "/post/%s/like";
     private String deleteEditPost = HOST + "/user/me/post/%s";
     private String getSearchUsers = HOST + "user/find?";
     private String getFollowerUsers = HOST + "user/%s/followers?";
     private String getFollowingUsers = HOST + "user/%s/following?";
+    private String getFeed = HOST + "feed";
+    private String getFeedWithId = HOST + "feed?limit=10&before=%s";
 
 
 
@@ -131,11 +133,11 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getLoadPosts( String idUser, int size,  String idPost) {
+    public JSONObject getLoadPosts( String idUser, String idPost) {
         if(idPost.isEmpty()){
             return getRequest( postGetPath + idUser);
         }
-        return getRequest( postGetPath + idUser + String.format(postLoadPost, size, idPost));
+        return getRequest( postGetPath + idUser + String.format(postLoadPost, 10, idPost));
     }
 
     @Override
@@ -153,7 +155,7 @@ public class ServerAPI implements API {
 
     @Override
     public JSONObject getPost( String idPost) {
-        return getRequest( String.format(getPost, idPost));
+        return getRequest(String.format(getPost, idPost));
     }
 
     @Override
@@ -168,7 +170,7 @@ public class ServerAPI implements API {
 
     @Override
     public JSONObject getComments(String idPost) {
-        return getRequest( String.format(postGetComment, idPost));
+        return getRequest(String.format(postGetComment, idPost));
     }
 
 
@@ -192,7 +194,7 @@ public class ServerAPI implements API {
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
 
         String paramString = URLEncodedUtils.format(params, "UTF-8");
-        System.err.println(" find URL " + getSearchUsers+paramString);
+        System.err.println(" find URL " + getSearchUsers + paramString);
         return getRequest(getSearchUsers + paramString);
     }
 
@@ -210,6 +212,14 @@ public class ServerAPI implements API {
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
         String paramString = URLEncodedUtils.format(params, "UTF-8");
         return getRequest(String.format(getFollowingUsers, id) + paramString);
+    }
+
+    @Override
+    public JSONObject getFeed(String postId) {
+        if(postId.isEmpty()){
+            return getRequest(getFeed);
+        }
+        return getRequest(String.format(getFeedWithId, postId));
     }
 
     private JSONObject logInSignUp(String email, String password, String path) {

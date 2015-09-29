@@ -59,7 +59,7 @@ public class CommentDetailsActivity extends AppCompatActivity {
 
 
             intent.putExtra(Utils.COMMENT, comment);
-            setResult(RESULT_OK, intent);
+            setResult(Utils.RESULT, intent);
            finish();
         } catch (JSONException e) {
             e.printStackTrace();
