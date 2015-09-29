@@ -25,7 +25,7 @@ public interface API {
     public JSONObject editComment(String postId, String commentId, String comment) throws JSONException;
     public JSONObject deleteComment(String postId, String commentId);
     public JSONObject findUsers (String name, int offset);
-    public JSONObject getFollower (String id, int offset);
+    public JSONObject getFollowers(String id, int offset);
     public JSONObject getFollowing (String id, int offset);
 
 

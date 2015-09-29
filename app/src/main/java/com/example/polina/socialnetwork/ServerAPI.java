@@ -197,7 +197,7 @@ public class ServerAPI implements API {
     }
 
     @Override
-    public JSONObject getFollower(String id, int offset) {
+    public JSONObject getFollowers(String id, int offset) {
         List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
         String paramString = URLEncodedUtils.format(params, "UTF-8");

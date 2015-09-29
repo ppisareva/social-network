@@ -31,7 +31,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -87,7 +86,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         userId = bundle.getString(Utils.USER_ID);
         if (userId.equals(snApp.getUserId())) {
             myProfile = true;
-            userId = snApp.getUserId();
         }
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout);
         thisContext = container.getContext();
@@ -146,7 +144,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
 
         if(!myProfile){
-            HashSet<String> users = snApp.getUserIDHashSet();
+            HashSet<String> users = snApp.getFollowerIds();
             if(users.contains(userId)){
                 checkBoxFollow.setOnCheckedChangeListener(null);
                 checkBoxFollow.setChecked(true);

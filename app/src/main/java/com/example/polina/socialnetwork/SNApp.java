@@ -21,14 +21,14 @@ public class SNApp extends Application {
     API api = new ServerAPI();
     ImageLoader mImageLoader;
     String userId;
-    HashSet<String> userIDHashSet;
+    HashSet<String> followerIds;
 
-    public HashSet<String> getUserIDHashSet() {
-        return userIDHashSet;
+    public HashSet<String> getFollowerIds() {
+        return followerIds;
     }
 
-    public void setUserIDHashSet(HashSet<String> userIDHashSet) {
-        this.userIDHashSet = userIDHashSet;
+    public void setFollowerIds(HashSet<String> followerIds) {
+        this.followerIds = followerIds;
     }
 
     public String getUserId() {
