@@ -177,6 +177,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 followersCount.setText(String.valueOf(--followerAmount));
                 checkBoxFollow.setText(getResources().getString(R.string.follow));
             }
+
             final String url = ServerAPI.HOST + "user/" + userId + "/follow";
             System.err.println(url);
             RequestQueue queue = Volley.newRequestQueue(thisContext);

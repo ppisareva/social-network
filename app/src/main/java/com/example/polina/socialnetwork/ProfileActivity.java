@@ -79,9 +79,6 @@ public class ProfileActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i) {
                     case PROFILE:
-                        Bundle bundle = new Bundle();
-                        bundle.putString(Utils.USER_ID, snApp.getUserId());
-                        profileFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
                     case LOG_OUT:
@@ -171,10 +168,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.edit_profile) {
-            Intent intent = new Intent(this, FormActivity_.class);
-            startActivity(intent);
-        }
+
         if (toggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);

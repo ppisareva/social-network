@@ -225,8 +225,11 @@ public class PostDetailsActivity extends AppCompatActivity {
             userName.setText(post.getName());
             imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
             postText.setText(post.getMessage());
-            commentsCount.setText(""+post.getCommentsCount());
+            commentsCount.setText("" + post.getCommentsCount());
+            countComments = post.getCommentsCount();
             likeCount.setText("" + post.getLikeCount());
+            countLikes = post.getLikeCount();
+
         if(post.isOwnLike()){
             checkBoxLike.setChecked(true);
         }
