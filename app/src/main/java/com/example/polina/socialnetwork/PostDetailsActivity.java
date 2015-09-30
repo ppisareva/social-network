@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -77,15 +78,18 @@ public class PostDetailsActivity extends AppCompatActivity {
     int countComments;
     int countLikes;
     int INTENT_EDIT = 0;
-
-
+    boolean myPost = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         intent = getIntent();
-        post = (Post)intent.getSerializableExtra(Utils.POST);
+        post = (Post) intent.getSerializableExtra(Utils.POST);
+        if (TextUtils.equals(post.getUserId(), snApp.getUserId())) {
+            myPost = true;
+        }
         mImageLoader = snApp.mImageLoader;
         adapter = new CommentsAdapter(this, mImageLoader, comments);
         LayoutInflater inflater = getLayoutInflater();
@@ -103,26 +107,35 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.manu_post_details, menu);
+        if (myPost) {
+            getMenuInflater().inflate(R.menu.manu_post_details, menu);
+        }
         return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_delete) {
-            deletePost();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.action_delete:
+                deletePost();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
-@Background
+
+
+    @Background
     public void deletePost() {
-    JSONObject o = snApp.api.deletePost(post.getPostId());
-    System.err.println("delet post "+o);
+        JSONObject o = snApp.api.deletePost(post.getPostId());
+        System.err.println("delet post " + o);
         back();
 
     }
+
     @UiThread
     public void back() {
         setResult(Utils.RESULT, intent);
@@ -132,12 +145,15 @@ public class PostDetailsActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.comment_menu, menu);
+        if (myPost) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.comment_menu, menu);
+        }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Comment comment = ((CommentsAdapter.ViewHolderComments) info.targetView.getTag()).comments;
         switch (item.getItemId()) {
@@ -146,6 +162,13 @@ public class PostDetailsActivity extends AppCompatActivity {
                 deleteComment(post.getPostId(), comment.getCommentId());
                 adapter.notifyDataSetChanged();
                 commentsCount.setText("" + (--countComments));
+                intent.putExtra(Utils.COMMENTS_COUNT, countComments);
+                if(!comments.isEmpty()) {
+                    intent.putExtra(Utils.LAST_COMMENT, comments.get(comments.size() - 1));
+                } else {
+                    intent.putExtra(Utils.LAST_COMMENT, (Parcelable[]) null);
+                }
+                setResult(RESULT_CANCELED, intent);
                 return true;
             case R.id.edit_id:
                 Intent intent = new Intent(PostDetailsActivity.this, CommentDetailsActivity_.class);
@@ -154,8 +177,10 @@ public class PostDetailsActivity extends AppCompatActivity {
                 intent.putExtra(Utils.POSITION, info.position - 1);
                 intent.putExtra(Utils.COMMENT, comment.getComment());
                 startActivityForResult(intent, INTENT_EDIT);
+
                 break;
         }
+
         return super.onContextItemSelected(item);
     }
 
@@ -168,6 +193,10 @@ public class PostDetailsActivity extends AppCompatActivity {
                 int position = bundle.getInt(Utils.POSITION);
                 comments.get(position).comment = commentFromIntent;
                 adapter.notifyDataSetChanged();
+                if(position==(comments.size()-1)) {
+                    intent.putExtra(Utils.LAST_COMMENT, comments.get(position));
+                    setResult(RESULT_CANCELED, intent);
+                }
             }
         }
 
@@ -202,15 +231,19 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     @UiThread
     public void viewComments(JSONObject o) {
-            JSONArray jsonArray = o.optJSONArray(Utils.COMMENTS);
-            System.err.println(jsonArray);
-            System.err.println(jsonArray.length());
-            comments.clear();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject commentJson = jsonArray.optJSONObject(i);
-                comments.add(Comment.parse(commentJson));
-            }
-            adapter.notifyDataSetChanged();
+        JSONArray jsonArray = o.optJSONArray(Utils.COMMENTS);
+        System.err.println(jsonArray);
+        System.err.println(jsonArray.length());
+        comments.clear();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject commentJson = jsonArray.optJSONObject(i);
+            comments.add(Comment.parse(commentJson));
+        }
+        if(!comments.isEmpty()) {
+            intent.putExtra(Utils.LAST_COMMENT, comments.get(comments.size() - 1));
+        }
+        setResult(RESULT_CANCELED, intent);
+        adapter.notifyDataSetChanged();
     }
 
     @UiThread
@@ -221,55 +254,57 @@ public class PostDetailsActivity extends AppCompatActivity {
     }
 
     public void loadPost() {
-            postDate.setText(Utils.parseDate(post.getCreatedAt()));
-            userName.setText(post.getName());
-            imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
-            postText.setText(post.getMessage());
-            commentsCount.setText("" + post.getCommentsCount());
-            countComments = post.getCommentsCount();
-            likeCount.setText("" + post.getLikeCount());
-            countLikes = post.getLikeCount();
+        postDate.setText(Utils.parseDate(post.getCreatedAt()));
+        userName.setText(post.getName());
+        imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
+        postText.setText(post.getMessage());
+        commentsCount.setText("" + post.getCommentsCount());
+        countComments = post.getCommentsCount();
+        likeCount.setText("" + post.getLikeCount());
+        countLikes = post.getLikeCount();
 
-        if(post.isOwnLike()){
+        if (post.isOwnLike()) {
             checkBoxLike.setChecked(true);
         }
-            if (!TextUtils.isEmpty(post.getLatitude())) {
-                location.setVisibility(View.VISIBLE);
-                location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
-                location.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Uri locationUri = android.net.Uri.parse((String) view.getTag());
-                        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
-                        intent.setPackage("com.google.android.apps.maps");
-                        startActivity(intent);
-                    }
-                });
-            }
-            if (post.getImage()!=null) {
-                imagePost.setVisibility(View.VISIBLE);
-                imagePost.setImageUrl(post.getImage(), mImageLoader);
-            }
-
-            checkBoxLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if (!TextUtils.isEmpty(post.getLatitude())) {
+            location.setVisibility(View.VISIBLE);
+            location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
+            location.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    compoundButton.setChecked(isChecked);
-                    likeCount.setText("" + (isChecked ? ++countLikes : --countLikes==0 ? "" : countLikes));
-                    final String url = ServerAPI.HOST + "post/" + post.getPostId() + "/like";
-                    Volley.newRequestQueue(PostDetailsActivity.this).add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> headers = new HashMap<>();
-                            CookieManager cookieManager = CookieManager.getInstance();
-                            headers.put("Cookie", cookieManager.getCookie(url));
-                            return headers;
-                        }
-                    });
+                public void onClick(View view) {
+                    Uri locationUri = android.net.Uri.parse((String) view.getTag());
+                    Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+                    intent.setPackage("com.google.android.apps.maps");
+                    startActivity(intent);
                 }
             });
-    }
+        }
+        if (post.getImage() != null) {
+            imagePost.setVisibility(View.VISIBLE);
+            imagePost.setImageUrl(post.getImage(), mImageLoader);
+        }
 
+        checkBoxLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                compoundButton.setChecked(isChecked);
+                likeCount.setText("" + (isChecked ? ++countLikes : --countLikes == 0 ? "" : countLikes));
+                final String url = ServerAPI.HOST + "post/" + post.getPostId() + "/like";
+                Volley.newRequestQueue(PostDetailsActivity.this).add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> headers = new HashMap<>();
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        headers.put("Cookie", cookieManager.getCookie(url));
+                        return headers;
+                    }
+                });
+                intent.putExtra(Utils.LIKES_COUNT, countLikes);
+                intent.putExtra(Utils.LIKE, isChecked);
+                setResult(RESULT_CANCELED, intent);
+            }
+        });
+    }
 
 
     public void onCommentSend(View v) {
@@ -277,8 +312,8 @@ public class PostDetailsActivity extends AppCompatActivity {
         sendComment(comment);
         newComment.setText("");
         commentsCount.setText("" + (++countComments));
-
-
+        intent.putExtra(Utils.COMMENTS_COUNT, countComments);
+        setResult(RESULT_CANCELED, intent);
     }
 
     @Background
@@ -299,6 +334,5 @@ public class PostDetailsActivity extends AppCompatActivity {
             System.err.println("VOLLY ERROR: " + error);
         }
     };
-
 
 }
