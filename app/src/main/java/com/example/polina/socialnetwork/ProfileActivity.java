@@ -52,6 +52,8 @@ public class ProfileActivity extends AppCompatActivity {
     private final int PROFILE = 0;
     private final int SEARCH = 2;
     private final int EDIT_PROFILE = 3;
+    private final int FEED = 4;
+
     @AfterViews
     protected void init(){
 
@@ -77,9 +79,6 @@ public class ProfileActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (i) {
                     case PROFILE:
-                        Bundle bundle = new Bundle();
-                        bundle.putString(Utils.USER_ID, snApp.getUserId());
-                        profileFragment.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
                     case LOG_OUT:
@@ -98,6 +97,10 @@ public class ProfileActivity extends AppCompatActivity {
                     case EDIT_PROFILE:
                         intent = new Intent(ProfileActivity.this, FormActivity_.class);
                         startActivity(intent);
+                        break;
+                    case FEED:
+                        FeedFragment feedFragment = new FeedFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, feedFragment).commit();
                         break;
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -165,10 +168,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.edit_profile) {
-            Intent intent = new Intent(this, FormActivity_.class);
-            startActivity(intent);
-        }
+
         if (toggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);

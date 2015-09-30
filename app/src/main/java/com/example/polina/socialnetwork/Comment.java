@@ -9,6 +9,7 @@ import java.io.Serializable;
  * Created by polina on 10.08.15.
  */
 public class Comment  implements Serializable{
+
     String name;
     String profileImage;
     String userID;
@@ -54,7 +55,7 @@ public class Comment  implements Serializable{
         String userID = object.optString(Utils.ID);
         String name = object.optString(Utils.NAME);
         Double timestamp = o.optDouble(Utils.TIMESTAMP);
-        String commentID = o.optString(Utils.COMMENT_ID);
+        String commentID = o.optString(Utils.ID);
         String comment=o.optString(Utils.COMMENT);
         return new Comment(userID, profileImage, name, timestamp, commentID, comment);
     }

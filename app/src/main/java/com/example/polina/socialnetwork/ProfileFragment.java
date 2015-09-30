@@ -70,7 +70,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     final ArrayList<Post> posts = new ArrayList<>();
     boolean myProfile = false;
 
-    private int totalPost = 10;
     private boolean loadingNow = true;
     int INTENT_DELETE = 0;
     int followerAmount = 0;
@@ -103,8 +102,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         birthday = (TextView) header.findViewById(R.id.prof_bday);
         image = (NetworkImageView) header.findViewById(R.id.prof_image);
         name = (TextView) header.findViewById(R.id.prof_name);
-
-
 
         adapter = new PostAdapter(thisContext, posts, snApp.mImageLoader);
         connectionFailed = getResources().getString(R.string.connection_faild);
@@ -156,6 +153,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         return v;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==INTENT_DELETE && Utils.RESULT == resultCode ){
+            new LoadPost().execute();
+        }
+
+    }
+
+
+
 
 
     CompoundButton.OnCheckedChangeListener myChangeListener = new CompoundButton.OnCheckedChangeListener() {
@@ -168,6 +176,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 followersCount.setText(String.valueOf(--followerAmount));
                 checkBoxFollow.setText(getResources().getString(R.string.follow));
             }
+
             final String url = ServerAPI.HOST + "user/" + userId + "/follow";
             System.err.println(url);
             RequestQueue queue = Volley.newRequestQueue(thisContext);
@@ -209,9 +218,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 1) {
                 if (loadingNow) {
                     loadingNow = false;
-
-                    LoadPostList loadPostList = new LoadPostList();
-                    loadPostList.execute();
+                    new LoadPostList().execute();
                 }
             }
         }
@@ -239,7 +246,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         protected JSONObject doInBackground(Void... voids) {
             System.out.println("------------------------------" + userId + "    " + postId);
             if (!postId.isEmpty()) {
-                return snApp.api.getLoadPosts(userId, totalPost, postId);
+                return snApp.api.getLoadPosts(userId, postId);
             }
             return null;
         }
@@ -268,7 +275,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         @Override
         protected JSONObject doInBackground(Void... voids) {
-            return snApp.api.getLoadPosts(userId, totalPost, "");
+            return snApp.api.getLoadPosts(userId,  "");
         }
 
         @Override
@@ -357,4 +364,5 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         new LoadProfile().execute();
     }
+
 }

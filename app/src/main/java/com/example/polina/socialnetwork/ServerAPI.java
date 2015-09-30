@@ -1,6 +1,5 @@
 package com.example.polina.socialnetwork;
 
-import android.content.Context;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
@@ -31,36 +30,34 @@ import java.util.List;
  */
 public class ServerAPI implements API {
     public static String HOST = "https://socialnetwork-core-rest.herokuapp.com/";
-    private String logInPath = HOST + "user/login";
-    private String sighUpPath = HOST + "user/register";
-    private String userInfoPath = HOST + "/user/me";
-    private String getUser = HOST + "/user/";
-    private String postPath = HOST + "/post";
-    private String postGetPath = HOST + "/timeline/";
-    private String postLoadPost = "?limit=%d&before=%s";
-    private static final String MAIL = "email";
-    private static final String PASSWORD = "password";
-    private String postGetComment = HOST + "/post/%s/comment";
-    private String getPost = HOST + "/post/%s";
-    private String getLike = HOST + "/post/%s/like";
-    private String deleteEditPost = HOST + "/user/me/post/%s";
-    private String getSearchUsers = HOST + "user/find?";
-    private String getFollowerUsers = HOST + "user/%s/followers?";
-    private String getFollowingUsers = HOST + "user/%s/following?";
-
-
-
-
+    private String LOG_IN = HOST + "user/login";
+    private String SIGN_UP = HOST + "user/register";
+    private String USER_INFO = HOST + "/user/me";
+    private String GET_USER = HOST + "/user/";
+    private String POST_USER = HOST + "/post";
+    private String GET_POSTS = HOST + "/timeline/";
+    private String GET_POSTS_LOAD = "?limit=%d&before=%s";
+    private final String MAIL = "email";
+    private final String PASSWORD = "password";
+    private String POST_GET_COMMENT = HOST + "post/%s/comment";
+    private String GET_POST = HOST + "/post/%s";
+    private String GET_LIKE = HOST + "/post/%s/like";
+    private String DELETE_EDIT_POST = HOST + "/user/me/post/%s";
+    private String GET_SEARCH_USERS = HOST + "user/find?";
+    private String GET_FOLLOWERS = HOST + "user/%s/followers?";
+    private String GET_FOLLOWING = HOST + "user/%s/following?";
+    private String GET_FEED = HOST + "feed";
+    private String GET_FEED_LOAD = HOST + "feed?limit=10&before=%s";
 
 
     @Override
     public JSONObject logIn(String email, String password) {
-        return logInSignUp(email, password, logInPath);
+        return logInSignUp(email, password, LOG_IN);
     }
 
     @Override
     public JSONObject signUp(String email, String password) {
-        return logInSignUp(email, password, sighUpPath);
+        return logInSignUp(email, password, SIGN_UP);
     }
 
     @Override
@@ -72,13 +69,12 @@ public class ServerAPI implements API {
             o.put(Utils.SEX, sex);
             o.put(Utils.PROF_URL, imageUrl);
             o.put(Utils.MINI_PROF_URL, imageMiniUrl);
-            return postRequest(o, userInfoPath);
+            return postRequest(o, USER_INFO);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
 
 
     private JSONObject deleteRequest(String path) {
@@ -122,20 +118,20 @@ public class ServerAPI implements API {
 
     @Override
     public JSONObject getProfile() {
-        return getRequest(userInfoPath);
+        return getRequest(USER_INFO);
     }
 
     @Override
     public JSONObject getUser(String userId) {
-        return getRequest(getUser+userId);
+        return getRequest(GET_USER +userId);
     }
 
     @Override
-    public JSONObject getLoadPosts( String idUser, int size,  String idPost) {
+    public JSONObject getLoadPosts( String idUser, String idPost) {
         if(idPost.isEmpty()){
-            return getRequest( postGetPath + idUser);
+            return getRequest( GET_POSTS + idUser);
         }
-        return getRequest( postGetPath + idUser + String.format(postLoadPost, size, idPost));
+        return getRequest( GET_POSTS + idUser + String.format(GET_POSTS_LOAD, 10, idPost));
     }
 
     @Override
@@ -143,7 +139,7 @@ public class ServerAPI implements API {
         JSONObject o = new JSONObject();
         try {
             o.put(Utils.COMMENT, comment);
-            postRequest( o, String.format(postGetComment, idPost) );
+            postRequest( o, String.format(POST_GET_COMMENT, idPost) );
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -153,22 +149,22 @@ public class ServerAPI implements API {
 
     @Override
     public JSONObject getPost( String idPost) {
-        return getRequest( String.format(getPost, idPost));
+        return getRequest(String.format(GET_POST, idPost));
     }
 
     @Override
     public JSONObject deletePost(String postId) {
-        return deleteRequest(String.format(deleteEditPost, postId));
+        return deleteRequest(String.format(DELETE_EDIT_POST, postId));
     }
 
     @Override
     public JSONObject getLike(String idPost) {
-        return getRequest(String.format(getLike, idPost));
+        return getRequest(String.format(GET_LIKE, idPost));
     }
 
     @Override
     public JSONObject getComments(String idPost) {
-        return getRequest( String.format(postGetComment, idPost));
+        return getRequest(String.format(POST_GET_COMMENT, idPost));
     }
 
 
@@ -177,12 +173,12 @@ public class ServerAPI implements API {
     public JSONObject editComment( String idPost, String idComment, String comment) throws JSONException {
         JSONObject o = new JSONObject();
         o.put(Utils.COMMENT, comment);
-        return putRequest(o, String.format(postGetComment, idPost) + "/" + idComment);
+        return putRequest(o, String.format(POST_GET_COMMENT, idPost) + "/" + idComment);
     }
 
     @Override
     public JSONObject deleteComment( String idPost, String idComment) {
-        return deleteRequest(String.format(postGetComment, idPost) + "/" + idComment);
+        return deleteRequest(String.format(POST_GET_COMMENT, idPost) + "/" + idComment);
     }
 
     @Override
@@ -192,8 +188,8 @@ public class ServerAPI implements API {
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
 
         String paramString = URLEncodedUtils.format(params, "UTF-8");
-        System.err.println(" find URL " + getSearchUsers+paramString);
-        return getRequest(getSearchUsers + paramString);
+        System.err.println(" find URL " + GET_SEARCH_USERS + paramString);
+        return getRequest(GET_SEARCH_USERS + paramString);
     }
 
     @Override
@@ -201,7 +197,7 @@ public class ServerAPI implements API {
         List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
         String paramString = URLEncodedUtils.format(params, "UTF-8");
-        return getRequest(String.format(getFollowerUsers, id) + paramString);
+        return getRequest(String.format(GET_FOLLOWERS, id) + paramString);
     }
 
     @Override
@@ -209,7 +205,15 @@ public class ServerAPI implements API {
         List<com.amazonaws.org.apache.http.NameValuePair> params = new LinkedList<>();
         params.add(new com.amazonaws.org.apache.http.message.BasicNameValuePair("offset", "" + offset));
         String paramString = URLEncodedUtils.format(params, "UTF-8");
-        return getRequest(String.format(getFollowingUsers, id) + paramString);
+        return getRequest(String.format(GET_FOLLOWING, id) + paramString);
+    }
+
+    @Override
+    public JSONObject getFeed(String postId) {
+        if(postId.isEmpty()){
+            return getRequest(GET_FEED);
+        }
+        return getRequest(String.format(GET_FEED_LOAD, postId));
     }
 
     private JSONObject logInSignUp(String email, String password, String path) {
@@ -290,7 +294,7 @@ public class ServerAPI implements API {
             o.put(Utils.POST_LOCATION, location);
             o.put(Utils.POST_IMAGE, image);
             o.put(Utils.POST_ACCOUNT, account);
-            return postRequest( o, postPath);
+            return postRequest( o, POST_USER);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

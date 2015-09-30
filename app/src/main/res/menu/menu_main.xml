@@ -3,11 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
 
-    <item android:id="@+id/edit_profile"
-        android:title="@string/edit_prof"
-        android:orderInCategory="100"
-        android:icon="@android:drawable/ic_menu_edit"
-        app:showAsAction="always" />
+
 
 
 </menu>

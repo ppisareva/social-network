@@ -16,7 +16,7 @@ public interface API {
     public  JSONObject getUser(String userId);
 
     public JSONObject newPost (String message, JSONObject location,  String image, String account);
-    public JSONObject getLoadPosts(String userId, int size, String postId);
+    public JSONObject getLoadPosts(String userId, String postId);
     public JSONObject sendComment(String postId, String comment);
     public JSONObject getPost(String postId);
     public JSONObject deletePost(String postId);
@@ -27,6 +27,8 @@ public interface API {
     public JSONObject findUsers (String name, int offset);
     public JSONObject getFollowers(String id, int offset);
     public JSONObject getFollowing (String id, int offset);
+    public JSONObject getFeed (String postId);
+
 
 
 
