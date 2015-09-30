@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +28,9 @@ public class FeedFragment extends Fragment {
     PostAdapter adapter;
     Context thisContext;
     ArrayList<Post> posts = new ArrayList<>();
-    private String postId;
+    private String lastPostId;
     private boolean loadingNow = true;
+    SwipeRefreshLayout refreshLayout;
 
 
     @Override
@@ -36,6 +38,7 @@ public class FeedFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_feed, null);
         feedList = (ListView) v.findViewById(R.id.list_feed);
+        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout_feed);
         snApp = (SNApp) getActivity().getApplication();
         thisContext  = container.getContext();
         adapter = new PostAdapter(thisContext, posts, snApp.mImageLoader);
@@ -54,6 +57,16 @@ public class FeedFragment extends Fragment {
         });
         new LoadPost().execute("");
 
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                adapter.clear();
+                new LoadPost().execute("");
+                refreshLayout.setRefreshing(false);
+            }
+        });
+
     return v;
     }
 
@@ -69,7 +82,7 @@ public class FeedFragment extends Fragment {
             if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 1) {
                 if (loadingNow) {
                     loadingNow = false;
-                    new LoadPost().execute(postId);
+                    new LoadPost().execute(lastPostId);
                 }
             }
         }
@@ -91,7 +104,7 @@ public class FeedFragment extends Fragment {
                         JSONObject jsonPost = jsonArray.getJSONObject(i);
                         posts.add(Post.parse(jsonPost));
                     }
-                   postId = (posts.size() > 0 ? posts.get(posts.size() - 1).getPostId() : "");
+                   lastPostId = (posts.size() > 0 ? posts.get(posts.size() - 1).getPostId() : "");
                   updateAdapter();
                 } catch (Exception e) {
                     e.printStackTrace();
