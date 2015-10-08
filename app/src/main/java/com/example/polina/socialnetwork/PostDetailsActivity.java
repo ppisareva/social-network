@@ -157,33 +157,23 @@ public class PostDetailsActivity extends AppCompatActivity {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 
-            if(TextUtils.equals(post.userId, snApp.userId)) {
-                if (TextUtils.equals(comment.userID, snApp.userId)) {
-                    mode.getMenuInflater().inflate(R.menu.comment_edit_delete, menu);
-                } else {
-                    mode.getMenuInflater().inflate(R.menu.comment_delete, menu);
-                }
+            if (TextUtils.equals(comment.userID, snApp.userId)) {
+                mode.getMenuInflater().inflate(R.menu.comment_edit_delete, menu);
+            } else if (TextUtils.equals(post.userId, snApp.userId)){
+                mode.getMenuInflater().inflate(R.menu.comment_delete, menu);
             } else {
-                if (TextUtils.equals(comment.userID, snApp.userId)) {
-                    mode.getMenuInflater().inflate(R.menu.comment_edit_delete, menu);
-                } else {
-                    return false;
-                }
+                return false;
             }
             return true;
         }
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            // TODO Auto-generated method stub
-
-            mode.setTitle("CheckBox is Checked");
             return false;
         }
     }
