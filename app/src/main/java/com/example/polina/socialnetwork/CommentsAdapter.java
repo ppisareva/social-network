@@ -44,7 +44,7 @@ public class CommentsAdapter extends ArrayAdapter<Comment>{
         } else {
             holder = (ViewHolderComments) view.getTag();
         }
-
+        holder.comments = comment;
         holder.image.setImageUrl(comment.getProfileImage(), mImageLoader);
         holder.comment.setText(comment.getComment());
         holder.date.setText(Utils.parseDate(comment.getTimestamp()));

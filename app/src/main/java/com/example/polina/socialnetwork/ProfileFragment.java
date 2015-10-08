@@ -1,5 +1,6 @@
 package com.example.polina.socialnetwork;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,16 +128,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         if (sharedPreferences.contains(Utils.NAME) && myProfile) {
             loadProfileFromMemory(sharedPreferences);
         }
-        new LoadProfile().execute();
-        new LoadPost().execute();
+        new LoadPost().execute("");
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshLayout.setRefreshing(true);
                 adapter.clear();
-                LoadPost lp = new LoadPost();
-                lp.execute();
+                new LoadPost().execute("");
                 refreshLayout.setRefreshing(false);
             }
         });
@@ -156,8 +156,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==INTENT_DELETE && Utils.RESULT == resultCode ){
-            new LoadPost().execute();
+        if(requestCode==INTENT_DELETE){
+            int position = data.getIntExtra(Utils.POSITION, 0);
+            switch (resultCode){
+                case Utils.RESULT:
+                    new LoadPost().execute("");
+                    break;
+                case Activity.RESULT_CANCELED:
+                    if(data!=null) {
+                        Post post = (Post) data.getSerializableExtra(Utils.POST);
+                        posts.set(position-1, post);
+                        adapter.notifyDataSetChanged();
+                    }
+                    break;
+            }
+
         }
 
     }
@@ -218,7 +231,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 1) {
                 if (loadingNow) {
                     loadingNow = false;
-                    new LoadPostList().execute();
+                    new LoadPost().execute(postId);
                 }
             }
         }
@@ -240,49 +253,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         startActivity(intent);
     }
 
-    class LoadPostList extends AsyncTask<Void, Void, JSONObject> {
+    class LoadPost extends AsyncTask<String, Void, JSONObject> {
 
+        private boolean refresh;
         @Override
-        protected JSONObject doInBackground(Void... voids) {
-            System.out.println("------------------------------" + userId + "    " + postId);
-            if (!postId.isEmpty()) {
-                return snApp.api.getLoadPosts(userId, postId);
-            }
-            return null;
+        protected JSONObject doInBackground(String... strings) {
+            refresh = TextUtils.isEmpty(strings[0]);
+            return snApp.api.getLoadPosts(userId,  strings[0]);
         }
 
         @Override
         protected void onPostExecute(JSONObject o) {
             if (o != null) {
                 try {
-                    JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
-                    JSONObject jsonPost;
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        jsonPost = jsonArray.getJSONObject(i);
-                        posts.add(Post.parse(jsonPost));
-                    }
-                    postId = (posts.size() > 0 ? posts.get(posts.size() - 1).getPostId() : "");
-                    updateAdapter();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-
-    class LoadPost extends AsyncTask<Void, Void, JSONObject> {
-
-        @Override
-        protected JSONObject doInBackground(Void... voids) {
-            return snApp.api.getLoadPosts(userId,  "");
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject o) {
-            if (o != null) {
-                try {
-                    posts.clear();
+                    if (refresh) posts.clear();
                     JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonPost = jsonArray.getJSONObject(i);

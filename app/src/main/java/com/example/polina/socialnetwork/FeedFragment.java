@@ -1,11 +1,13 @@
 package com.example.polina.socialnetwork;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +33,13 @@ public class FeedFragment extends Fragment {
     private String lastPostId;
     private boolean loadingNow = true;
     SwipeRefreshLayout refreshLayout;
-
+    int INTENT_DELETE = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_feed, null);
+
         feedList = (ListView) v.findViewById(R.id.list_feed);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout_feed);
         snApp = (SNApp) getActivity().getApplication();
@@ -52,7 +55,7 @@ public class FeedFragment extends Fragment {
                 Intent intent = new Intent(thisContext, PostDetailsActivity_.class);
                 intent.putExtra(Utils.POST, post);
                 intent.putExtra(Utils.POSITION, i);
-                startActivity(intent);
+                startActivityForResult(intent, INTENT_DELETE);
             }
         });
         new LoadPost().execute("");
@@ -68,6 +71,27 @@ public class FeedFragment extends Fragment {
         });
 
     return v;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==INTENT_DELETE){
+            int position = data.getIntExtra(Utils.POSITION, 0);
+            switch (resultCode){
+                case Utils.RESULT:
+                    new LoadPost().execute("");
+                    break;
+                case Activity.RESULT_CANCELED:
+                    if(data!=null) {
+                        Post post = (Post) data.getSerializableExtra(Utils.POST);
+                        posts.set(position, post);
+                        adapter.notifyDataSetChanged();
+                    }
+                    break;
+            }
+
+        }
     }
 
     AbsListView.OnScrollListener myScrollListener = new AbsListView.OnScrollListener() {
@@ -90,8 +114,10 @@ public class FeedFragment extends Fragment {
 
     class LoadPost extends AsyncTask<String, Void, JSONObject> {
 
+        private boolean refresh;
         @Override
         protected JSONObject doInBackground(String... strings) {
+            refresh = TextUtils.isEmpty(strings[0]);
             return snApp.api.getFeed(strings[0]);
         }
 
@@ -99,6 +125,7 @@ public class FeedFragment extends Fragment {
         protected void onPostExecute(JSONObject o) {
             if (o != null) {
                 try {
+                    if (refresh) posts.clear();
                     JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonPost = jsonArray.getJSONObject(i);

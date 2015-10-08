@@ -18,7 +18,9 @@ public class Comment  implements Serializable{
     String comment;
 
 
+public Comment(){
 
+}
     public Comment(String userID, String profileImage, String name, Double timestamp, String commentId, String comment) {
         this.userID = userID;
         this.profileImage = profileImage;
@@ -59,4 +61,5 @@ public class Comment  implements Serializable{
         String comment=o.optString(Utils.COMMENT);
         return new Comment(userID, profileImage, name, timestamp, commentID, comment);
     }
+
 }

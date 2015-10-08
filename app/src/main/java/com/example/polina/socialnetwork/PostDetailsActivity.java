@@ -1,11 +1,14 @@
 package com.example.polina.socialnetwork;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -77,15 +80,22 @@ public class PostDetailsActivity extends AppCompatActivity {
     int countComments;
     int countLikes;
     int INTENT_EDIT = 0;
-
+    boolean myPost = false;
+    SharedPreferences sharedPreferences;
+    android.view.ActionMode actionMode;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         intent = getIntent();
-        post = (Post)intent.getSerializableExtra(Utils.POST);
+        sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+        post = (Post) intent.getSerializableExtra(Utils.POST);
+        if (TextUtils.equals(post.getUserId(), snApp.getUserId())) {
+            myPost = true;
+        }
         mImageLoader = snApp.mImageLoader;
         adapter = new CommentsAdapter(this, mImageLoader, comments);
         LayoutInflater inflater = getLayoutInflater();
@@ -101,63 +111,111 @@ public class PostDetailsActivity extends AppCompatActivity {
         commentsCount = (TextView) header.findViewById(R.id.comment_count_details);
     }
 
+
+    class ActionBarCallBack implements ActionMode.Callback {
+
+        Comment comment;
+        int position;
+
+        public ActionBarCallBack(Comment comment, int position) {
+            this.comment = comment;
+            this.position = position;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            switch (item.getItemId()) {
+                case R.id.delete_id:
+                    comments.remove(position - 1);
+                    deleteComment(post.getPostId(), comment.getCommentId());
+                    adapter.notifyDataSetChanged();
+                    commentsCount.setText("" + (--countComments));
+                    post.commentsCount = countComments;
+                    if(countComments==0){
+                        post.lastComment = null;
+                    } else{
+                        post.lastComment = comments.get(comments.size() - 1);
+                    }
+                    intent.putExtra(Utils.POST, post);
+                    setResult(RESULT_CANCELED, intent);
+                    mode.finish();
+                    break;
+                case R.id.edit_id:
+                    Intent intent = new Intent(PostDetailsActivity.this, CommentDetailsActivity_.class);
+                    intent.putExtra(Utils.COMMENT_ID, comment.getCommentId());
+                    intent.putExtra(Utils.POST_ID, post.getPostId());
+                    intent.putExtra(Utils.POSITION, position - 1);
+                    intent.putExtra(Utils.COMMENT, comment.getComment());
+                    startActivityForResult(intent, INTENT_EDIT);
+                    mode.finish();
+                    break;
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+
+            if (TextUtils.equals(comment.userID, snApp.userId)) {
+                mode.getMenuInflater().inflate(R.menu.comment_edit_delete, menu);
+            } else if (TextUtils.equals(post.userId, snApp.userId)){
+                mode.getMenuInflater().inflate(R.menu.comment_delete, menu);
+            } else {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.manu_post_details, menu);
+        if (myPost) {
+            getMenuInflater().inflate(R.menu.manu_post_details, menu);
+        }
         return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_delete) {
-            deletePost();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.action_delete:
+                deletePost();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
-@Background
+
+
+    @Background
     public void deletePost() {
-    JSONObject o = snApp.api.deletePost(post.getPostId());
-    System.err.println("delet post "+o);
+        JSONObject o = snApp.api.deletePost(post.getPostId());
+        System.err.println("delet post " + o);
         back();
 
     }
+
     @UiThread
     public void back() {
         setResult(Utils.RESULT, intent);
         finish();
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.comment_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        Comment comment = ((CommentsAdapter.ViewHolderComments) info.targetView.getTag()).comments;
-        switch (item.getItemId()) {
-            case R.id.delete_id:
-                comments.remove(info.position - 1);
-                deleteComment(post.getPostId(), comment.getCommentId());
-                adapter.notifyDataSetChanged();
-                commentsCount.setText("" + (--countComments));
-                return true;
-            case R.id.edit_id:
-                Intent intent = new Intent(PostDetailsActivity.this, CommentDetailsActivity_.class);
-                intent.putExtra(Utils.COMMENT_ID, comment.getCommentId());
-                intent.putExtra(Utils.POST_ID, post.getPostId());
-                intent.putExtra(Utils.POSITION, info.position - 1);
-                intent.putExtra(Utils.COMMENT, comment.getComment());
-                startActivityForResult(intent, INTENT_EDIT);
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -168,6 +226,11 @@ public class PostDetailsActivity extends AppCompatActivity {
                 int position = bundle.getInt(Utils.POSITION);
                 comments.get(position).comment = commentFromIntent;
                 adapter.notifyDataSetChanged();
+                if(position==(comments.size()-1)) {
+                    post.lastComment = comments.get(position);
+                    intent.putExtra(Utils.POST, post);
+                    setResult(RESULT_CANCELED, intent);
+                }
             }
         }
 
@@ -184,10 +247,19 @@ public class PostDetailsActivity extends AppCompatActivity {
     protected void init() {
         commentsList.addHeaderView(header, null, false);
         commentsList.setAdapter(adapter);
-        registerForContextMenu(commentsList);
+        commentsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Comment comment = (Comment) adapterView.getItemAtPosition(i);
+                actionMode = PostDetailsActivity.this.startActionMode(new ActionBarCallBack(comment,i));
+
+            }
+        });
         loadPost();
         loadComments();
     }
+
+
 
 
     @Background
@@ -202,15 +274,20 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     @UiThread
     public void viewComments(JSONObject o) {
-            JSONArray jsonArray = o.optJSONArray(Utils.COMMENTS);
-            System.err.println(jsonArray);
-            System.err.println(jsonArray.length());
-            comments.clear();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject commentJson = jsonArray.optJSONObject(i);
-                comments.add(Comment.parse(commentJson));
-            }
-            adapter.notifyDataSetChanged();
+        JSONArray jsonArray = o.optJSONArray(Utils.COMMENTS);
+        System.err.println(jsonArray);
+        System.err.println(jsonArray.length());
+        comments.clear();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject commentJson = jsonArray.optJSONObject(i);
+            comments.add(Comment.parse(commentJson));
+        }
+        if(!comments.isEmpty()) {
+            post.lastComment=comments.get(comments.size() - 1);
+            intent.putExtra(Utils.POST, post);
+        }
+        setResult(RESULT_CANCELED, intent);
+        adapter.notifyDataSetChanged();
     }
 
     @UiThread
@@ -221,55 +298,58 @@ public class PostDetailsActivity extends AppCompatActivity {
     }
 
     public void loadPost() {
-            postDate.setText(Utils.parseDate(post.getCreatedAt()));
-            userName.setText(post.getName());
-            imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
-            postText.setText(post.getMessage());
-            commentsCount.setText("" + post.getCommentsCount());
-            countComments = post.getCommentsCount();
-            likeCount.setText("" + post.getLikeCount());
-            countLikes = post.getLikeCount();
+        postDate.setText(Utils.parseDate(post.getCreatedAt()));
+        userName.setText(post.getName());
+        imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
+        postText.setText(post.getMessage());
+        commentsCount.setText("" + post.getCommentsCount());
+        countComments = post.getCommentsCount();
+        likeCount.setText("" + post.getLikeCount());
+        countLikes = post.getLikeCount();
 
-        if(post.isOwnLike()){
+        if (post.isOwnLike()) {
             checkBoxLike.setChecked(true);
         }
-            if (!TextUtils.isEmpty(post.getLatitude())) {
-                location.setVisibility(View.VISIBLE);
-                location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
-                location.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Uri locationUri = android.net.Uri.parse((String) view.getTag());
-                        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
-                        intent.setPackage("com.google.android.apps.maps");
-                        startActivity(intent);
-                    }
-                });
-            }
-            if (post.getImage()!=null) {
-                imagePost.setVisibility(View.VISIBLE);
-                imagePost.setImageUrl(post.getImage(), mImageLoader);
-            }
-
-            checkBoxLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if (!TextUtils.isEmpty(post.getLatitude())) {
+            location.setVisibility(View.VISIBLE);
+            location.setTag("geo: " + post.getLatitude() + "," + post.getLongitude() + "");
+            location.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    compoundButton.setChecked(isChecked);
-                    likeCount.setText("" + (isChecked ? ++countLikes : --countLikes==0 ? "" : countLikes));
-                    final String url = ServerAPI.HOST + "post/" + post.getPostId() + "/like";
-                    Volley.newRequestQueue(PostDetailsActivity.this).add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> headers = new HashMap<>();
-                            CookieManager cookieManager = CookieManager.getInstance();
-                            headers.put("Cookie", cookieManager.getCookie(url));
-                            return headers;
-                        }
-                    });
+                public void onClick(View view) {
+                    Uri locationUri = android.net.Uri.parse((String) view.getTag());
+                    Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+                    intent.setPackage("com.google.android.apps.maps");
+                    startActivity(intent);
                 }
             });
-    }
+        }
+        if (post.getImage() != null) {
+            imagePost.setVisibility(View.VISIBLE);
+            imagePost.setImageUrl(post.getImage(), mImageLoader);
+        }
 
+        checkBoxLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                compoundButton.setChecked(isChecked);
+                likeCount.setText("" + (isChecked ? ++countLikes : --countLikes == 0 ? "" : countLikes));
+                final String url = ServerAPI.HOST + "post/" + post.getPostId() + "/like";
+                Volley.newRequestQueue(PostDetailsActivity.this).add(new StringRequest((isChecked ? Request.Method.POST : Request.Method.DELETE), url, LISTENER, ERROR_LISTENER) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> headers = new HashMap<>();
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        headers.put("Cookie", cookieManager.getCookie(url));
+                        return headers;
+                    }
+                });
+                post.likeCount= countLikes;
+                post.ownLike=isChecked;
+                intent.putExtra(Utils.POST, post);
+                setResult(RESULT_CANCELED, intent);
+            }
+        });
+    }
 
 
     public void onCommentSend(View v) {
@@ -277,8 +357,9 @@ public class PostDetailsActivity extends AppCompatActivity {
         sendComment(comment);
         newComment.setText("");
         commentsCount.setText("" + (++countComments));
-
-
+        post.commentsCount= countComments;
+        intent.putExtra(Utils.POST, post);
+        setResult(RESULT_CANCELED, intent);
     }
 
     @Background
@@ -299,6 +380,5 @@ public class PostDetailsActivity extends AppCompatActivity {
             System.err.println("VOLLY ERROR: " + error);
         }
     };
-
 
 }

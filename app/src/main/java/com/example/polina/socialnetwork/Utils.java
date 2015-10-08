@@ -67,7 +67,7 @@ public class Utils {
     public static  final String FOLLOWERS_COUNT = "followers_count";
     public static  final String FOLLOWING_COUNT = "following_count";
     public static  final String FOLLOWER = "follower";
-    public static  final int RESULT = 1;
+    public static  final int RESULT = 1000009;
 
 
 
