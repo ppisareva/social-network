@@ -33,9 +33,7 @@ public class FeedFragment extends Fragment {
     private String lastPostId;
     private boolean loadingNow = true;
     SwipeRefreshLayout refreshLayout;
-    int CHANGE_POST = 1;
     int INTENT_DELETE = 0;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,46 +77,21 @@ public class FeedFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==INTENT_DELETE){
+            int position = data.getIntExtra(Utils.POSITION, 0);
             switch (resultCode){
                 case Utils.RESULT:
                     new LoadPost().execute("");
                     break;
                 case Activity.RESULT_CANCELED:
                     if(data!=null) {
-                        int position = data.getIntExtra(Utils.POSITION, 0);
-                        int comment_count = data.getIntExtra(Utils.COMMENTS_COUNT, posts.get(position).commentsCount);
-                        int like_count = data.getIntExtra(Utils.LIKES_COUNT, posts.get(position).likeCount);
-                        boolean isLike = data.getBooleanExtra(Utils.LIKE, posts.get(position).isOwnLike());
-                        Comment comment = (Comment)data.getSerializableExtra(Utils.LAST_COMMENT);
                         Post post = (Post) data.getSerializableExtra(Utils.POST);
-
-
-                        if (comment_count != post.getCommentsCount()) {
-                            posts.get(position).commentsCount = comment_count;
-                        }
-                        if (like_count != post.getLikeCount() && like_count >= 0) {
-                            posts.get(position).likeCount = like_count;
-                            posts.get(position).ownLike = isLike;
-                        }
-                        if(post.getLastComment()==null || comment==null){
-                            posts.get(position).lastComment = comment;
-                        } else {
-
-                            if(!TextUtils.equals(post.getLastComment().getComment(), comment.getComment())){
-                                posts.get(position).lastComment = comment;
-                            }
-                        }
+                        posts.set(position, post);
                         adapter.notifyDataSetChanged();
                     }
                     break;
             }
 
         }
-
-
-
-
-
     }
 
     AbsListView.OnScrollListener myScrollListener = new AbsListView.OnScrollListener() {
@@ -141,8 +114,10 @@ public class FeedFragment extends Fragment {
 
     class LoadPost extends AsyncTask<String, Void, JSONObject> {
 
+        private boolean refresh;
         @Override
         protected JSONObject doInBackground(String... strings) {
+            refresh = TextUtils.isEmpty(strings[0]);
             return snApp.api.getFeed(strings[0]);
         }
 
@@ -150,7 +125,7 @@ public class FeedFragment extends Fragment {
         protected void onPostExecute(JSONObject o) {
             if (o != null) {
                 try {
-                    posts.clear();
+                    if (refresh) posts.clear();
                     JSONArray jsonArray = o.getJSONArray(Utils.POSTS_JSON);
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonPost = jsonArray.getJSONObject(i);
