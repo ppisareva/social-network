@@ -5,7 +5,8 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible">
+            android:visibility="visible"
+            >
 
             <ListView
                 android:layout_width="match_parent"
@@ -35,7 +36,9 @@
                     android:layout_height="wrap_content"
                     android:text="@string/add_comment"
                     android:layout_weight="0"
-                    android:onClick="onCommentSend" />
+                    android:background="@drawable/button"
+                    android:onClick="onCommentSend"
+                    android:textColor="@color/white"/>
             </LinearLayout>
 
 </LinearLayout>

@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -44,8 +45,9 @@ public class CreatePostActivity extends AppCompatActivity {
     ImageView postImage;
     @ViewById(R.id.location_button)
     ImageView post_location;
-    @ViewById(R.id.account_attach_button)
-    ImageView account_attached;
+    @ViewById(R.id.image_button)
+    ImageView imageButton;
+
     Uri attachedImage;
 
     private static final int RESULT_LOAD_IMAGE = 2;
@@ -146,6 +148,7 @@ public class CreatePostActivity extends AppCompatActivity {
             loadImage(attachedImage);
             postImage.setVisibility(View.VISIBLE);
             postImage.setImageURI(attachedImage);
+            imageButton.setImageResource(R.drawable.ic_local_see_black_48dp);
         }
     }
 
@@ -162,6 +165,7 @@ public class CreatePostActivity extends AppCompatActivity {
         System.err.println("image " + image);
         postImage.setVisibility(View.VISIBLE);
         postImage.setImageURI(attachedImage);
+        imageButton.setImageResource(R.drawable.ic_local_see_black_48dp);
     }
 
     @Background
@@ -220,10 +224,6 @@ public class CreatePostActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onAccountAttach(View v) {
-        account_attached.setImageResource(R.drawable.ic_supervisor_account_black_48dp);
     }
 
     private boolean isNetworkAvailable() {

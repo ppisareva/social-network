@@ -80,7 +80,11 @@ public class PostAdapter extends ArrayAdapter<Post> {
         holder.imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
         holder.userName.setText(post.getName());
         holder.postDate.setText(Utils.parseDate(post.getCreatedAt()));
-        holder.postText.setText(post.getMessage());
+        holder.postText.setVisibility(View.GONE);
+        if(!TextUtils.isEmpty(post.getMessage())) {
+            holder.postText.setVisibility(View.VISIBLE);
+            holder.postText.setText(post.getMessage());
+        }
         holder.imagePost.setVisibility(View.GONE);
         if (!TextUtils.isEmpty(post.getImage())) {
             holder.imagePost.setVisibility(View.VISIBLE);

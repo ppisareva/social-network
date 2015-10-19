@@ -3,6 +3,8 @@ package com.example.polina.socialnetwork;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
@@ -68,6 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         toggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(toggle);
 
+
         ListView left_menu = (ListView) findViewById(R.id.lv_navigation_drawer);
         left_menu.setAdapter(new ArrayAdapter<String>(
                 this,
@@ -107,13 +110,9 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         ActionBar bar = getSupportActionBar();
-
-
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setHomeButtonEnabled(true);
         bar.setDisplayShowHomeEnabled(true);
-
-
     }
 
 
@@ -121,6 +120,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
+        setTitle(sharedPreferences.getString(Utils.NAME, "OLOLO"));
         profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
         bundle.putString(Utils.USER_ID, snApp.getUserId());

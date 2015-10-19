@@ -31,7 +31,7 @@
         android:id="@+id/user_name"
         android:layout_weight="1"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="5dp" />
+        android:layout_marginBottom="0dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -42,8 +42,8 @@
         android:layout_toEndOf="@+id/user_image"
         android:id="@+id/time_stamp"
         android:layout_weight="1"
-        android:layout_marginTop="5dp"
-        android:textSize="12dp"/>
+        android:textSize="10dp"
+        android:textColor="@color/gray" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -65,9 +65,9 @@
         android:visibility="gone"
         android:scaleType="centerCrop"
         android:layout_below="@+id/post_text"
-        android:layout_alignLeft="@+id/post_text"
-        android:layout_alignStart="@+id/post_text"
-        android:layout_marginRight="10dp" />
+
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -127,8 +127,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/linearLayout"
-        android:layout_alignLeft="@+id/linearLayout"
-        android:layout_alignStart="@+id/linearLayout"
         android:touchscreenBlocksFocus="false"
         android:id="@+id/layout_comment"
         android:visibility="gone">

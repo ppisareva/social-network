@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/material_design"
+    android:background="@color/background"
 
     android:gravity="bottom">
 
@@ -56,5 +56,6 @@
         android:layout_marginBottom="@dimen/mega_margin"
         android:layout_marginLeft="@dimen/mega_margin"
         android:layout_marginRight="@dimen/mega_margin"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/white" />
 </LinearLayout>

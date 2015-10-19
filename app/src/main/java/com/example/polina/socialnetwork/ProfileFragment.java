@@ -16,7 +16,6 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -31,6 +30,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,7 +52,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public TextView birthday;
     public NetworkImageView image;
     public TextView name;
-    Button postSend;
+    FloatingActionButton postSend;
     TextView following;
     TextView followingCount;
     TextView followers;
@@ -91,7 +91,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresh_layout);
         thisContext = container.getContext();
 
-        header = (ViewGroup) inflater.inflate(R.layout.profile_layout, postList, false);
+        header = (ViewGroup) inflater.inflate(R.layout.profile_header, postList, false);
         followers = (TextView) header.findViewById(R.id.button_followers);
         followers.setOnClickListener(this);
         followersCount = (TextView) header.findViewById(R.id.follower_count);
@@ -100,7 +100,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         followingCount = (TextView) header.findViewById(R.id.following_count);
         checkBoxFollow = (CheckBox) header.findViewById(R.id.checkBoxFollow);
         checkBoxFollow.setOnCheckedChangeListener(myChangeListener);
-        postSend = (Button) header.findViewById(R.id.button_post_activity);
+        postSend = (FloatingActionButton) v.findViewById(R.id.button_post_activity);
         birthday = (TextView) header.findViewById(R.id.prof_bday);
         image = (NetworkImageView) header.findViewById(R.id.prof_image);
         name = (TextView) header.findViewById(R.id.prof_name);
@@ -122,6 +122,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 startActivityForResult(intent, INTENT_DELETE);
             }
         });
+
+        postSend.attachToListView(postList);
 
 
         System.err.println("user id " + userId);

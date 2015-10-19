@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;

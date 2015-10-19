@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:background="@drawable/material_design"
+    android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layout"
@@ -13,11 +13,8 @@
         android:text="@string/sign_up"
         android:id="@+id/sign_up"
         android:onClick="onClick"
-        android:background="@color/button_sign_up"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        style="@style/button_registration"
        />
 
     <Button
@@ -26,9 +23,6 @@
         android:text="@string/sign_in"
         android:id="@+id/sign_in"
         android:onClick="onClick"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:background="@color/button_sign_in"
+        style="@style/button_registration"
         android:layout_gravity="bottom" />
 </LinearLayout>
