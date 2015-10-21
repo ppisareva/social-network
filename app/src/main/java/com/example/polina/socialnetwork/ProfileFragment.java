@@ -159,7 +159,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==INTENT_DELETE){
-            int position = data.getIntExtra(Utils.POSITION, 0);
+
             switch (resultCode){
                 case Utils.RESULT:
                     new LoadPost().execute("");
@@ -167,6 +167,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 case Activity.RESULT_CANCELED:
                     if(data!=null) {
                         Post post = (Post) data.getSerializableExtra(Utils.POST);
+                        int position = data.getIntExtra(Utils.POSITION, 0);
                         posts.set(position-1, post);
                         adapter.notifyDataSetChanged();
                     }

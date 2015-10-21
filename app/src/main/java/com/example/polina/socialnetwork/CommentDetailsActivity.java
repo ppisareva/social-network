@@ -33,6 +33,7 @@ public class CommentDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         super.onCreate(savedInstanceState);
     }
 
@@ -74,11 +75,14 @@ public class CommentDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_send) {
-            String comment = edit.getText().toString();
-            editComment(comment);
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.action_send:
+                String comment = edit.getText().toString();
+                editComment(comment);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

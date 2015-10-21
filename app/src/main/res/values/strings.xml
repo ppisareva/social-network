@@ -13,7 +13,7 @@
     <string name="title_activity_sign_up">OLOLO</string>
     <string name="registration_faild">User already exist</string>
     <string name="password_wrong">Wrong password</string>
-    <string name="title_activity_form_activity"></string>
+    <string name="title_activity_form_activity">Edit profile</string>
     <string name="form_name">name</string>
     <string name="form_birthday">birthday</string>
     <string name="form_sex">sex</string>
@@ -49,7 +49,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    
+
     <string-array name="left_menu">
         <item>My profile</item>
         <item>Log out</item>
@@ -57,7 +57,7 @@
         <item>Edit profile</item>
         <item>Feed</item>
     </string-array>
-    <string name="search">search</string>
+    <string name="search">Search</string>
     <string name="search_name">Enter search name</string>
     <string name="followings">Following</string>
     <string name="followers">Followers</string>

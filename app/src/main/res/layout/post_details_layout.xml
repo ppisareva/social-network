@@ -90,13 +90,14 @@
                 android:layout_weight="1"
                 android:layout_marginTop="5dp"
                 android:textSize="17dp"
-                android:focusableInTouchMode="true" />
+                android:focusableInTouchMode="true"
+                android:textColor="@color/gray_text" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/comment_butten_details"
-                android:src="@drawable/ic_mode_comment_black_48dp"
+                android:src="@drawable/ic_mode_comment_grey1_48dp"
                 android:layout_marginRight="5dp" />
 
             <TextView
@@ -106,13 +107,14 @@
                 android:textSize="17dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginRight="3dp"
-                android:layout_marginLeft="3dp" />
+                android:layout_marginLeft="3dp"
+                android:textColor="@color/gray_text" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/image_lication_details"
-                android:src="@drawable/ic_room_black_48dp"
+                android:src="@drawable/ic_room_gray_48dp"
                 android:visibility="gone"
                 android:clickable="true" />
 

@@ -367,7 +367,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     @Background
     public void sendComment(String comment) {
-        JSONObject o = snApp.api.sendComment(post.getPostId(), comment);
+        snApp.api.sendComment(post.getPostId(), comment);
         loadComments();
     }
 

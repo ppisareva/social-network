@@ -18,6 +18,9 @@
         android:layout_gravity="center_horizontal"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
+        android:scrollbarStyle="outsideInset"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
 
     />
 
