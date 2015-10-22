@@ -3,7 +3,8 @@
 
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+   >
 
     <EditText
         android:layout_width="match_parent"
@@ -31,31 +32,41 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0">
+        android:layout_weight="0"
+        android:background="@color/button">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <ImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
-            style="@style/buttom_action_bar"
+            style="@style/button_action_bar"
             android:background="@drawable/ic_location_on_white_48dp"
             android:id="@+id/location_button"
-            android:onClick="onLocationAttach" />
+            android:onClick="onLocationAttach"
+            android:layout_marginTop="3dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <ImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
-            style="@style/buttom_action_bar"
+            style="@style/button_action_bar"
             android:id="@+id/image_button"
             android:onClick="onImageAttach"
-            android:background="@drawable/ic_photo_camera_white_48dp" />
+            android:background="@drawable/ic_photo_camera_white_48dp"
+            android:layout_marginTop="5dp" />
 
-        <ImageView
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            style="@style/buttom_action_bar"
-            android:background="@drawable/ic_supervisor_account_white_48dp"
-            android:id="@+id/account_attach_button"
-            android:onClick="onAccountAttach"
-            android:scaleType="fitEnd" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
     </LinearLayout>
 </LinearLayout>

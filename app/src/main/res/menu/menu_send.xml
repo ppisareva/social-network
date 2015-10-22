@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.polina.socialnetwork.CommentDetailsActivity">
     <item android:id="@+id/action_send"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_done_white_24dp"
         android:title="@string/edit"
         android:orderInCategory="100"
         app:showAsAction="always" />

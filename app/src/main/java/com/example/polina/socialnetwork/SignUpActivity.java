@@ -3,6 +3,8 @@ package com.example.polina.socialnetwork;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -38,6 +40,8 @@ public class SignUpActivity extends AppCompatActivity {
         JSONObject o = snApp.api.signUp(email, password);
         check(o);
     }
+
+
 
     @org.androidannotations.annotations.UiThread
     void check(JSONObject o) {

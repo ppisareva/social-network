@@ -2,6 +2,7 @@ package com.example.polina.socialnetwork;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
@@ -71,9 +72,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     Intent intent;
     private Post post;
-    String idUser;
     private ImageLoader mImageLoader;
-    ArrayList<User> usersLiked;
     private CommentsAdapter adapter;
     ViewGroup header;
     ArrayList<Comment> comments = new ArrayList<Comment>();
@@ -251,7 +250,7 @@ public class PostDetailsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Comment comment = (Comment) adapterView.getItemAtPosition(i);
-                actionMode = PostDetailsActivity.this.startActionMode(new ActionBarCallBack(comment,i));
+                actionMode = PostDetailsActivity.this.startActionMode(new ActionBarCallBack(comment, i));
 
             }
         });
@@ -301,7 +300,11 @@ public class PostDetailsActivity extends AppCompatActivity {
         postDate.setText(Utils.parseDate(post.getCreatedAt()));
         userName.setText(post.getName());
         imageUser.setImageUrl(post.getProfileImage(), mImageLoader);
-        postText.setText(post.getMessage());
+        postText.setVisibility(View.GONE);
+        if(!TextUtils.isEmpty(post.getMessage())){
+            postText.setText(post.getMessage());
+            postText.setVisibility(View.VISIBLE);
+        }
         commentsCount.setText("" + post.getCommentsCount());
         countComments = post.getCommentsCount();
         likeCount.setText("" + post.getLikeCount());
@@ -364,7 +367,7 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     @Background
     public void sendComment(String comment) {
-        JSONObject o = snApp.api.sendComment(post.getPostId(), comment);
+        snApp.api.sendComment(post.getPostId(), comment);
         loadComments();
     }
 

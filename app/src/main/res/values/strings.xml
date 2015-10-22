@@ -7,12 +7,13 @@
     <string name="password_conformation">confirm your password</string>
     <string name="sign_up">Sign Up</string>
     <string name="sign_in">Sign In</string>
-    <string name="title_activity_intro">intro</string>
-    <string name="title_activity_sign_in">Sign_in</string>
-    <string name="title_activity_sign_up">Sign_up</string>
+    <string name="program_name">OLOLO</string>
+    <string name="title_activity_intro">OLOLO</string>
+    <string name="title_activity_sign_in">OLOLO</string>
+    <string name="title_activity_sign_up">OLOLO</string>
     <string name="registration_faild">User already exist</string>
     <string name="password_wrong">Wrong password</string>
-    <string name="title_activity_form_activity">Form_activity</string>
+    <string name="title_activity_form_activity">Edit profile</string>
     <string name="form_name">name</string>
     <string name="form_birthday">birthday</string>
     <string name="form_sex">sex</string>
@@ -28,18 +29,18 @@
         <item quantity="other">%d years</item>
     </plurals>
     <string name="button_post">new post</string>
-    <string name="title_activity_create_post">Create Post</string>
+    <string name="title_activity_create_post"></string>
     <string name="gallary">load from gallery</string>
     <string name="shot">take a shot</string>
     <string name="connection_faild">no connection to the internet</string>
     <string name="wait">Please wait...</string>
     <string name="wrong_login_password">Wrong login or password</string>
-    <string name="title_activity_post_details">PostDetailsActivity</string>
+    <string name="title_activity_post_details"></string>
     <string name="add_comment">send</string>
-    <string name="title_activity_comment_details">CommentDetailsActivity</string>
+    <string name="title_activity_comment_details"></string>
     <string name="edit">edit comment</string>
     <string name="delete">delete comment</string>
-    <string name="title_activity_side_menu">SideMenu</string>
+    <string name="title_activity_side_menu">OLOLO</string>
 
     <string name="hello_world">Hello world!</string>
 
@@ -48,7 +49,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    
+
     <string-array name="left_menu">
         <item>My profile</item>
         <item>Log out</item>
@@ -56,15 +57,15 @@
         <item>Edit profile</item>
         <item>Feed</item>
     </string-array>
-    <string name="search">search</string>
+    <string name="search">Search</string>
     <string name="search_name">Enter search name</string>
     <string name="followings">Following</string>
     <string name="followers">Followers</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
-    <string name="title_activity_user">UserActivity</string>
+    <string name="title_activity_user"></string>
     <string name="no_users">No users found</string>
     <string name="my_profile"> (my profile) </string>
-    <string name="title_activity_follow">FollowActivity</string>
+    <string name="title_activity_follow"></string>
 
 </resources>

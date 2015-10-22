@@ -1,6 +1,5 @@
 package com.example.polina.socialnetwork;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -9,14 +8,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.android.volley.toolbox.NetworkImageView;
 
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
@@ -40,7 +45,7 @@ public class FormActivity extends AppCompatActivity {
     @ViewById(R.id.form_sex)
     public TextView sex;
     @ViewById(R.id.form_image)
-    public ImageView profilePhoto;
+    public NetworkImageView profilePhoto;
     @App
     SNApp snApp;
 
@@ -62,6 +67,7 @@ public class FormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences(Utils.PROFILE_PREFERENCES, MODE_PRIVATE);
         loadProfInfo();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Background
@@ -84,7 +90,7 @@ public class FormActivity extends AppCompatActivity {
                 imageURI = o.getString(Utils.PROF_URL);
                 miniImageURI = o.getString(Utils.MINI_PROF_URL);
                 sex.setText(o.getString(Utils.SEX));
-                saveProfileImage(new URL(profileURL));
+                profilePhoto.setImageUrl(profileURL, snApp.mImageLoader);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(Utils.NAME, o.getString(Utils.NAME));
                 editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
@@ -95,22 +101,6 @@ public class FormActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    @Background
-    public void saveProfileImage(URL url) {
-        try {
-            InputStream in = url.openStream();
-            Bitmap bitmap = BitmapFactory.decodeStream(in);
-            saveImage(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @UiThread
-    public void saveImage(Bitmap bitmap) {
-        profilePhoto.setImageBitmap(bitmap);
     }
 
     protected Dialog onCreateDialog(int id) {
@@ -169,8 +159,25 @@ public class FormActivity extends AppCompatActivity {
         }
     }
 
-    public void onSave(View v) {
-        saveProf();
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_send, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case android.R.id.home:
+                    onBackPressed();
+                    break;
+                case R.id.action_send:
+                    saveProf();
+                    return true;
+            }
+            return super.onOptionsItemSelected(item);
     }
 
     @Background

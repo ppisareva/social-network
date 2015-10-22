@@ -3,30 +3,20 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/material_design" >
+    >
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/form_text"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/layout"
 
        >
 
-        <ImageView
+        <com.android.volley.toolbox.NetworkImageView
             android:layout_width="200dp"
             android:layout_height="250dp"
             android:id="@+id/form_image"
@@ -34,7 +24,7 @@
             android:onClick="onImageAdd"
             android:hint="@string/buttun_form_image"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/add_user"
+            android:src="@drawable/add_photo"
             android:adjustViewBounds="false" />
 
 
@@ -44,8 +34,7 @@
             android:id="@+id/form_name"
             style="@style/form_button"
             android:background="@android:color/transparent"
-            android:hint="@string/form_name"
-             />
+            android:hint="@string/form_name" />
 
         <TextView
             android:layout_width="match_parent"
@@ -67,27 +56,6 @@
             android:hint="@string/form_sex"
             />
 
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:gravity="bottom">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onSave"
-            android:text="@string/button_form_submit"
-            android:background="@color/button_sign_in"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_gravity="center_horizontal"
-           />
 
     </LinearLayout>
 

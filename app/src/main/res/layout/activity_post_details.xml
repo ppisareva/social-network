@@ -5,11 +5,12 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible">
+            android:visibility="visible"
+            >
 
             <ListView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:id="@+id/comments"
                 android:visibility="visible"
                 android:layout_weight="1" />
@@ -26,16 +27,21 @@
 
                 <EditText
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="fill_parent"
                     android:id="@+id/edit_comment"
                     android:layout_weight="5" />
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/add_comment"
                     android:layout_weight="0"
-                    android:onClick="onCommentSend" />
+                    android:onClick="onCommentSend"
+                    android:drawableStart="@drawable/ic_send_white_24dp"
+                    android:paddingLeft="30dp"
+                    android:background="@drawable/button_shap"
+
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginRight="5dp" />
             </LinearLayout>
 
 </LinearLayout>

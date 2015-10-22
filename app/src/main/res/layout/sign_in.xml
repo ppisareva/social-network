@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/material_design"
+    android:background="@color/background"
     android:id="@+id/layout1"
     android:gravity="bottom"
     android:weightSum="1">
@@ -43,10 +43,8 @@
         android:text="@string/sign_in"
         android:onClick="signIn"
         android:id="@+id/button"
-        android:background="@color/button_sign_in"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_gravity="center_horizontal" />
+        style="@style/button_registration"
+        android:layout_gravity="center_horizontal"
+        />
 
 </LinearLayout>
