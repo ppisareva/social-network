@@ -108,8 +108,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         adapter = new PostAdapter(thisContext, posts, snApp.mImageLoader);
         connectionFailed = getResources().getString(R.string.connection_faild);
         postList = (ListView) v.findViewById(R.id.posts_list);
-        postList.setAdapter(adapter);
         postList.addHeaderView(header, null, false);
+        postList.setAdapter(adapter);
         postList.setOnScrollListener(myScrollListener);
         postList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

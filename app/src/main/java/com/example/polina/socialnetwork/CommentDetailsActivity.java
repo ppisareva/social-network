@@ -29,16 +29,9 @@ public class CommentDetailsActivity extends AppCompatActivity {
     String commentId;
     String comment;
 
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        super.onCreate(savedInstanceState);
-    }
-
     @AfterViews
     protected void init() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         intent = getIntent();
         Bundle bundle= intent.getExtras();
         if(bundle!=null) {

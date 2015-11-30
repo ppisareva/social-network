@@ -50,6 +50,11 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="profile">My profile</string>
+    <string name="log_out">Log out</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="feed">Feed</string>
+
     <string-array name="left_menu">
         <item>My profile</item>
         <item>Log out</item>
@@ -67,5 +72,6 @@
     <string name="no_users">No users found</string>
     <string name="my_profile"> (my profile) </string>
     <string name="title_activity_follow"></string>
+    <string name="facebook_app_id">1633762573546029</string>
 
 </resources>
