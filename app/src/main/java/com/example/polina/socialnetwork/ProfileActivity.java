@@ -2,29 +2,28 @@ package com.example.polina.socialnetwork;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.facebook.login.LoginManager;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.EActivity;
@@ -56,31 +55,30 @@ public class ProfileActivity extends AppCompatActivity {
     private final int EDIT_PROFILE = 3;
     private final int FEED = 4;
 
+
+    Drawer result;
+
     @AfterViews
     protected void init(){
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
-
-        toggle.setDrawerIndicatorEnabled(true);
-        drawerLayout.setDrawerListener(toggle);
-
-
-        ListView left_menu = (ListView) findViewById(R.id.lv_navigation_drawer);
-        left_menu.setAdapter(new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.left_menu)));
-        left_menu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            Intent intent;
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                switch (i) {
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .withHasStableIds(true)
+                .withToolbar(toolbar)
+                .addDrawerItems(new PrimaryDrawerItem().withName(getResources().getString(R.string.profile)).withIcon(GoogleMaterial.Icon.gmd_account),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.log_out)).withIcon(GoogleMaterial.Icon.gmd_arrow_back),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.search)).withIcon(GoogleMaterial.Icon.gmd_search),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.edit_profile)).withIcon(GoogleMaterial.Icon.gmd_edit),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.feed)).withIcon(GoogleMaterial.Icon.gmd_collection_image)
+                        )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        Intent intent;
+                        switch (position) {
                     case PROFILE:
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, profileFragment).commit();
                         break;
@@ -91,6 +89,7 @@ public class ProfileActivity extends AppCompatActivity {
                         sharedPreferences.edit().clear().commit();
                         intent = new Intent(ProfileActivity.this, IntroActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                         startActivity(intent);
                         break;
                     case SEARCH:
@@ -106,13 +105,11 @@ public class ProfileActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_profile, feedFragment).commit();
                         break;
                 }
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }
-        });
-        ActionBar bar = getSupportActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.setHomeButtonEnabled(true);
-        bar.setDisplayShowHomeEnabled(true);
+
+                        return false;
+                    }
+                })
+                .build();
     }
 
 
@@ -167,26 +164,13 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (toggle.onOptionsItemSelected(item))
-            return true;
-        return super.onOptionsItemSelected(item);
+    public void onBackPressed() {
+        if (result != null && result.isDrawerOpen()) {
+            result.closeDrawer();
+        } else {
+            super.onBackPressed();
+        }
     }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        toggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        toggle.onConfigurationChanged(newConfig);
-
-    }
-
    }
 
 

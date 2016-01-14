@@ -1,27 +1,34 @@
 package com.example.polina.socialnetwork;
 
+import android.content.Entity;
+import android.net.Uri;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 
+import com.amazonaws.org.apache.http.HttpEntity;
+import com.amazonaws.org.apache.http.HttpResponse;
+import com.amazonaws.org.apache.http.NameValuePair;
+import com.amazonaws.org.apache.http.client.methods.HttpDelete;
+import com.amazonaws.org.apache.http.client.methods.HttpGet;
+import com.amazonaws.org.apache.http.client.methods.HttpPost;
+import com.amazonaws.org.apache.http.client.methods.HttpPut;
 import com.amazonaws.org.apache.http.client.utils.URLEncodedUtils;
+import com.amazonaws.org.apache.http.cookie.Cookie;
+import com.amazonaws.org.apache.http.entity.ContentType;
+import com.amazonaws.org.apache.http.entity.StringEntity;
+import com.amazonaws.org.apache.http.impl.client.DefaultHttpClient;
+import com.amazonaws.org.apache.http.message.BasicNameValuePair;
+import com.amazonaws.org.apache.http.protocol.HTTP;
+import com.amazonaws.org.apache.http.util.EntityUtils;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,6 +38,7 @@ import java.util.List;
 public class ServerAPI implements API {
     public static String HOST = "https://socialnetwork-core-rest.herokuapp.com/";
     private String LOG_IN = HOST + "user/login";
+    private String LOG_IN_WITH_FACEBOOK = HOST + "user/facebook";
     private String SIGN_UP = HOST + "user/register";
     private String USER_INFO = HOST + "/user/me";
     private String GET_USER = HOST + "/user/";
@@ -39,6 +47,7 @@ public class ServerAPI implements API {
     private String GET_POSTS_LOAD = "?limit=%d&before=%s";
     private final String MAIL = "email";
     private final String PASSWORD = "password";
+    private final String TOKEN = "access_token";
     private String POST_GET_COMMENT = HOST + "post/%s/comment";
     private String GET_POST = HOST + "/post/%s";
     private String GET_LIKE = HOST + "/post/%s/like";
@@ -52,12 +61,17 @@ public class ServerAPI implements API {
 
     @Override
     public JSONObject logIn(String email, String password) {
-        return logInSignUp(email, password, LOG_IN);
+        return logInSignUp(LOG_IN, email, password);
+    }
+
+    @Override
+    public JSONObject logInWithFacebook(String token) {
+        return logInSignUp(LOG_IN_WITH_FACEBOOK, token);
     }
 
     @Override
     public JSONObject signUp(String email, String password) {
-        return logInSignUp(email, password, SIGN_UP);
+        return logInSignUp(SIGN_UP, email, password);
     }
 
     @Override
@@ -76,6 +90,15 @@ public class ServerAPI implements API {
         }
     }
 
+    public static final String getString(HttpEntity entity){
+
+        try {
+            return new String(EntityUtils.toByteArray(entity));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     private JSONObject deleteRequest(String path) {
         try {
@@ -85,7 +108,7 @@ public class ServerAPI implements API {
             delete.addHeader("Cookie", cookieManager.getCookie(path));
             HttpResponse resp = client.execute(delete);
             if (resp.getStatusLine().getStatusCode() < 400) {
-                String s = EntityUtils.toString(resp.getEntity());
+                String s = getString(resp.getEntity());
                 return new JSONObject(s);
             } else {
                 return null;
@@ -103,9 +126,10 @@ public class ServerAPI implements API {
             HttpGet get = new HttpGet(path);
             CookieManager cookieManager = CookieManager.getInstance();
             get.addHeader("Cookie", cookieManager.getCookie(path));
-            HttpResponse resp = client.execute(get);
+            HttpResponse resp = client.execute(get);            ;
+            String s = getString(resp.getEntity());
+            System.out.println(s);
             if (resp.getStatusLine().getStatusCode() < 400) {
-                String s = EntityUtils.toString(resp.getEntity());
                 return new JSONObject(s);
             } else {
                 return null;
@@ -147,19 +171,10 @@ public class ServerAPI implements API {
         return null;
     }
 
-    @Override
-    public JSONObject getPost( String idPost) {
-        return getRequest(String.format(GET_POST, idPost));
-    }
 
     @Override
     public JSONObject deletePost(String postId) {
         return deleteRequest(String.format(DELETE_EDIT_POST, postId));
-    }
-
-    @Override
-    public JSONObject getLike(String idPost) {
-        return getRequest(String.format(GET_LIKE, idPost));
     }
 
     @Override
@@ -216,15 +231,22 @@ public class ServerAPI implements API {
         return getRequest(String.format(GET_FEED_LOAD, postId));
     }
 
-    private JSONObject logInSignUp(String email, String password, String path) {
+    private JSONObject logInSignUp(String path, String ... params) {
         try {
+            String data;
             DefaultHttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(path);
-            List<NameValuePair> nameValuePairs = new ArrayList(2);
-            nameValuePairs.add(new BasicNameValuePair(MAIL, email));
-            nameValuePairs.add(new BasicNameValuePair(PASSWORD, password));
-            post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+            if(params.length>1) {
+                 data = String.format("%s=%s&%s=%s", MAIL, Uri.encode(params[0]), PASSWORD, Uri.encode(params[1]));
+            } else {
+                data = String.format("%s=%s", TOKEN, Uri.encode(params[0]));
+            }
+            System.out.println(data);
+            post.setEntity(new StringEntity(data));
+            post.addHeader( "Content-Type", "application/x-www-form-urlencoded");
             HttpResponse resp = client.execute(post);
+            String s = getString(resp.getEntity());
+            System.out.println(s);
             if (resp.getStatusLine().getStatusCode() < 400) {
                 List<Cookie> cookies = client.getCookieStore().getCookies();
                 CookieManager cookieManager = CookieManager.getInstance();
@@ -236,7 +258,6 @@ public class ServerAPI implements API {
                         cookieManager.setCookie(sessionCookie.getDomain(), cookieString);
                     }
                 CookieSyncManager.getInstance().sync();
-                String s = EntityUtils.toString(resp.getEntity());
                 return new JSONObject(s);
             } else {
                 System.err.println("ERROR: " + resp.getStatusLine());
@@ -255,10 +276,10 @@ public class ServerAPI implements API {
             CookieManager cookieManager = CookieManager.getInstance();
             post.addHeader("Cookie", cookieManager.getCookie(path));
             String data = o.toString();
-            post.setEntity(new StringEntity(data, HTTP.UTF_8));
+            post.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
             HttpResponse resp = client.execute(post);
             if (resp.getStatusLine().getStatusCode() < 400) {
-                String s = EntityUtils.toString(resp.getEntity());
+                String s = getString(resp.getEntity());
                 return new JSONObject(s);
             } else return null;
         } catch (Exception e) {
@@ -274,10 +295,10 @@ public class ServerAPI implements API {
             CookieManager cookieManager = CookieManager.getInstance();
             post.addHeader("Cookie", cookieManager.getCookie(path));
             String data = o.toString();
-            post.setEntity(new StringEntity(data, HTTP.UTF_8));
+            post.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
             HttpResponse resp = client.execute(post);
             if (resp.getStatusLine().getStatusCode() < 400) {
-                String s = EntityUtils.toString(resp.getEntity());
+                String s = getString(resp.getEntity());
                 return new JSONObject(s);
             } else return null;
         } catch (Exception e) {
@@ -285,7 +306,6 @@ public class ServerAPI implements API {
             return null;
         }
     }
-
 
     public JSONObject newPost( String massage, JSONObject location, String image, String account) {
         JSONObject o = new JSONObject();

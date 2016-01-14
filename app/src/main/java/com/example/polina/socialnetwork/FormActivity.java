@@ -73,6 +73,7 @@ public class FormActivity extends AppCompatActivity {
     @Background
     public void loadProfInfo() {
         JSONObject o = snApp.api.getProfile();
+        System.out.println(o);
         addProfileInfo(o);
     }
 
@@ -86,11 +87,11 @@ public class FormActivity extends AppCompatActivity {
 
                 String years = getResources().getQuantityString(R.plurals.years, y, y);
                 birthday.setText(years);
-                String profileURL = o.getString(Utils.PROF_URL);
                 imageURI = o.getString(Utils.PROF_URL);
+                System.out.println("image url" + imageURI);
                 miniImageURI = o.getString(Utils.MINI_PROF_URL);
                 sex.setText(o.getString(Utils.SEX));
-                profilePhoto.setImageUrl(profileURL, snApp.mImageLoader);
+                profilePhoto.setImageUrl(imageURI, snApp.mImageLoader);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(Utils.NAME, o.getString(Utils.NAME));
                 editor.putString(Utils.BIRTHDAY, o.getString(Utils.BIRTHDAY));
