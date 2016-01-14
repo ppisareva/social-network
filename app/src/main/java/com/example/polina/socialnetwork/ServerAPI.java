@@ -38,7 +38,7 @@ import java.util.List;
 public class ServerAPI implements API {
     public static String HOST = "https://socialnetwork-core-rest.herokuapp.com/";
     private String LOG_IN = HOST + "user/login";
-    private String LOG_IN_WITH_FACEBOOK = HOST + "user/login";
+    private String LOG_IN_WITH_FACEBOOK = HOST + "user/facebook";
     private String SIGN_UP = HOST + "user/register";
     private String USER_INFO = HOST + "/user/me";
     private String GET_USER = HOST + "/user/";
@@ -47,7 +47,7 @@ public class ServerAPI implements API {
     private String GET_POSTS_LOAD = "?limit=%d&before=%s";
     private final String MAIL = "email";
     private final String PASSWORD = "password";
-    private final String TOKEN = "token";
+    private final String TOKEN = "access_token";
     private String POST_GET_COMMENT = HOST + "post/%s/comment";
     private String GET_POST = HOST + "/post/%s";
     private String GET_LIKE = HOST + "/post/%s/like";
@@ -126,9 +126,10 @@ public class ServerAPI implements API {
             HttpGet get = new HttpGet(path);
             CookieManager cookieManager = CookieManager.getInstance();
             get.addHeader("Cookie", cookieManager.getCookie(path));
-            HttpResponse resp = client.execute(get);
+            HttpResponse resp = client.execute(get);            ;
+            String s = getString(resp.getEntity());
+            System.out.println(s);
             if (resp.getStatusLine().getStatusCode() < 400) {
-                String s = getString(resp.getEntity());
                 return new JSONObject(s);
             } else {
                 return null;

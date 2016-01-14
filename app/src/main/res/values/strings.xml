@@ -6,6 +6,7 @@
     <string name="password">enter your password</string>
     <string name="password_conformation">confirm your password</string>
     <string name="sign_up">Sign Up</string>
+    <string name="error">error</string>
     <string name="sign_in">Sign In</string>
     <string name="program_name">OLOLO</string>
     <string name="title_activity_intro">OLOLO</string>

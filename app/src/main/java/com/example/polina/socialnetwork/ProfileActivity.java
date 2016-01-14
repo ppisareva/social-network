@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.facebook.login.LoginManager;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -88,6 +89,7 @@ public class ProfileActivity extends AppCompatActivity {
                         sharedPreferences.edit().clear().commit();
                         intent = new Intent(ProfileActivity.this, IntroActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                         startActivity(intent);
                         break;
                     case SEARCH:
