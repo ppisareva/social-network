@@ -15,9 +15,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.android.volley.toolbox.NetworkImageView;
-import com.facebook.login.LoginManager;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;

@@ -1,9 +1,7 @@
 package com.example.polina.socialnetwork;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -69,7 +67,6 @@ public class IntroActivity extends AppCompatActivity {
                             public void onCompleted(JSONObject user, GraphResponse response) {
                                 if (user != null) {
                                     String token = AccessToken.getCurrentAccessToken().getToken();
-                                    System.out.println("88888888    " + token);
                                     new LogIn().execute(token);
                                 }
 
@@ -117,7 +114,7 @@ public class IntroActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException e) {
 
-                Toast.makeText(IntroActivity.this, getResources().getString(R.string.error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(IntroActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
